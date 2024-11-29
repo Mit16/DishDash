@@ -31,3 +31,10 @@
 .navbar li{
     cursor: pointer;
 }
+
+@media(max-width:1050px){
+    .navbar .logo{
+        width: 140px;
+    }
+
+}
