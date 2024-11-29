@@ -22,7 +22,7 @@ const Footer = () => {
         <h5 className="text-lg font-bold">Products</h5>
         <ul className="text-sm">
           <li><a href="#" className="text-gray-400 hover:text-white">Ride</a></li>
-          <li><a href="#" className="text-gray-400 hover:text-white">Drive</a></li>
+          
           <li><a href="#" className="text-gray-400 hover:text-white">Deliver</a></li>
           <li><a href="#" className="text-gray-400 hover:text-white">Eat</a></li>
           <li><a href="#" className="text-gray-400 hover:text-white">Gift cards</a></li>
