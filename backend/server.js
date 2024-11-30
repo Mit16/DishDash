@@ -5,7 +5,7 @@ import foodRouter from "./routes/foodRoute.js";
 
 //app config
 const app = express();
-const PORT = 3000;
+const PORT = 4000;
 
 //middleware
 app.use(express.json());
