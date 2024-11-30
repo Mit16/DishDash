@@ -1,9 +1,11 @@
-import { useContext} from "react";
+import { useContext } from "react";
 import "./FoodItem.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
+// import { PriceContext } from "../../context/PriceContext";
 
 const Fooditem = ({ id, name, price, descripion, image }) => {
+  // const { indianPrice } = useContext(PriceContext);
 
   const indianPrice = (price) => {
     return price * 30;
