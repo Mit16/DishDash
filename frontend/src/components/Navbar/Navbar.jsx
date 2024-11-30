@@ -1,59 +1,62 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "./Navbar.css";
 import { assets } from "../../assets/assets";
 import { Link, NavLink } from "react-router-dom";
+import { StoreContext } from "../../context/StoreContext";
 
 const Navbar = ({ setShowSignin }) => {
   const [menu, setMenu] = useState("Menu");
+
+  const { getTotalCartAmount } = useContext(StoreContext);
 
   return (
     <div className="navbar px-5 py-0 flex justify-between items-center">
       <Link to="/">
         <img src={assets.logo} alt="" className="logo w-32" />
       </Link>
-      <ul className="flex list-none gap-5 text-[#49557e] text-lg">
-        {/* <li><NavLink >Home</NavLink></li>
-        <li><NavLink >Menu</NavLink></li>
-        <li><NavLink >Mobile</NavLink></li>
-        <li><NavLink >About</NavLink></li>
-        <li><NavLink >Contact</NavLink></li> */}
-        <Link to="/">
-          <li
-            onClick={() => setMenu("Home")}
-            className={menu === "Home" ? "active" : ""}
-          >
-            Home
-          </li>
+      <ul className="navbar-menu flex list-none gap-5 text-[#49557e] text-lg">
+        <Link
+          to="/"
+          onClick={() => setMenu("Home")}
+          className={menu === "Home" ? "active" : ""}
+        >
+          Home
         </Link>
-        <li
+        <a
+          href="#explore-menu"
           onClick={() => setMenu("Menu")}
           className={menu === "Menu" ? "active" : ""}
         >
           Menu
-        </li>
-        <li
+        </a>
+        <a
+          href="#mobile"
           onClick={() => setMenu("Mobile")}
           className={menu === "Mobile" ? "active" : ""}
         >
           Mobile
-        </li>
-        <li
+        </a>
+        <a
+          href="#about"
           onClick={() => setMenu("About")}
           className={menu === "About" ? "active" : ""}
         >
           About
-        </li>
-        <li
+        </a>
+        <a
+          href="#contact"
           onClick={() => setMenu("Contact")}
           className={menu === "Contact" ? "active" : ""}
         >
           Contact
-        </li>
+        </a>
       </ul>
       <div className="flex items-center gap-3 py-1">
         <img src={assets.search_icon} alt="" />
         <div className="relative">
-          <Link to='/cart'><img src={assets.basket_icon} alt="" /></Link>
+          <Link to="/cart">
+            <img src={assets.basket_icon} alt="" />
+          </Link>
           <div className="dot absolute min-w-2.5 min-h-2.5 bg-orange-500 rounded -top-2 -right-2 "></div>
         </div>
         <button onClick={() => setShowSignin(true)}>Sign In</button>
