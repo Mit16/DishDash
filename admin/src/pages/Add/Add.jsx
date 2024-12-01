@@ -2,6 +2,7 @@ import "./Add.css";
 import { assets } from "../../assets/assets";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Add = () => {
   const URL = "http://localhost:4000";
@@ -37,8 +38,10 @@ const Add = () => {
         price: "",
         category: "Salad",
       });
-    } else {
       setImage(false);
+      toast.success(response.data.message);
+    } else {
+      toast.error(response.data.message);
     }
   };
 
@@ -49,6 +52,7 @@ const Add = () => {
           <p>Upload Image</p>
           <label htmlFor="image">
             <img
+              // ERROE: showing createObjectURL is not a function
               src={image ? URL.createObjectURL(image) : assets.upload_area}
               alt=""
             />
@@ -58,7 +62,7 @@ const Add = () => {
             type="file"
             id="image"
             hidden
-            required
+            // required
           />
         </div>
         <div className="add-product-name flex-col">
