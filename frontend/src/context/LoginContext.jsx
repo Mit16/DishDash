@@ -1,23 +1,16 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 export const LoginContext = createContext(null);
 
 const LoginContextProvider = (props) => {
-  const URL = "http://localhost:4000";
+ 
 
-  const [token, setToken] = useState("");
+  // const { fetchFoodList } = useContext(StoreContext);
 
-  //to store the token and prevent the logout when refreshed problem
-  useEffect(() => {
-    if (localStorage.getItem("Token")) {
-      setToken(localStorage.getItem("Token"));
-    }
-  }, []);
+  
 
   const LogincontextValue = {
-    URL,
-    token,
-    setToken,
+
   };
 
   return (

@@ -3,11 +3,11 @@ import "./Navbar.css";
 import { assets } from "../../assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
-import { LoginContext } from "../../context/LoginContext";
+
 
 const Navbar = ({ setShowSignin }) => {
   const [menu, setMenu] = useState("Home");
-  const { token, setToken } = useContext(LoginContext);
+  const { token, setToken } = useContext(StoreContext);
   const { getTotalCartAmount } = useContext(StoreContext);
   const navigate = useNavigate();
 

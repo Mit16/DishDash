@@ -1,11 +1,11 @@
 import { useContext, useState } from "react";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
-import { LoginContext } from "../../context/LoginContext";
 import axios from "axios";
+import { StoreContext } from "../../context/StoreContext";
 
 const LoginPopup = ({ setShowSignin }) => {
-  const { URL, setToken } = useContext(LoginContext);
+  const { URL, setToken } = useContext(StoreContext);
 
   const [currState, setCurrState] = useState("Sign In");
   const [data, setData] = useState({
