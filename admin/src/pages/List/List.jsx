@@ -3,11 +3,11 @@ import "./List.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const List = ({ URL }) => {
+const List = ({ apiURL }) => {
   const [list, setList] = useState([]);
 
   const fetchList = async () => {
-    const response = await axios.get(`${URL}/api/food/list`);
+    const response = await axios.get(`${apiURL}/api/food/list`);
     if (response.data.success) {
       setList(response.data.data);
     } else {
@@ -16,7 +16,9 @@ const List = ({ URL }) => {
   };
 
   const removeFood = async (foodId) => {
-    const response = await axios.post(`${URL}/api/food/remove`, { id: foodId });
+    const response = await axios.post(`${apiURL}/api/food/remove`, {
+      id: foodId,
+    });
     await fetchList();
     if (response.data.success) {
       toast.success(response.data.message);
@@ -43,7 +45,7 @@ const List = ({ URL }) => {
         {list.map((item, index) => {
           return (
             <div key={index} className="list-table-format">
-              <img src={`${URL}/images/` + item.image} alt="" />
+              <img src={item.image} alt="" />
               <p>{item.name}</p>
               <p>{item.category}</p>
               <p>₹ {item.price}</p>

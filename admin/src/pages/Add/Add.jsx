@@ -4,8 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const Add = ({URL}) => {
-
+const Add = ({ apiURL }) => {
   const [image, setImage] = useState(false);
   const [data, setData] = useState({
     name: "",
@@ -29,18 +28,18 @@ const Add = ({URL}) => {
     formData.append("category", data.category);
     formData.append("image", image);
 
-    const response = await axios.post(`${URL}/api/food/add`, formData);
-    if (response.data.success) {
-      setData({
-        name: "",
-        description: "",
-        price: "",
-        category: "Salad",
-      });
-      setImage(false);
-      toast.success(response.data.message);
-    } else {
-      toast.error(response.data.message);
+    try {
+      const response = await axios.post(`${apiURL}/api/food/add`, formData);
+      if (response.data.success) {
+        setData({ name: "", description: "", price: "", category: "Salad" });
+        setImage(false);
+        toast.success(response.data.message);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Axios Error Details:", error);
+      toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
 
