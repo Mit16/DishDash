@@ -6,15 +6,18 @@ import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
 import Footer from "./components/Footer/Footer";
 import { useState } from "react";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
+import FeedbackPopup from "./components/FeedbackPopup/FeedbackPopup";
 
 const App = () => {
   const [showSignin, setShowSignin] = useState(false);
+  const [showFeedback,setShowFeedback] = useState(true);
 
   return (
     <>
       {showSignin ? <LoginPopup setShowSignin={setShowSignin} /> : <></>}
+      {showFeedback ? <FeedbackPopup setShowFeedback={setShowFeedback} /> : <></>}
       <div className="app">
-        <Navbar setShowSignin={setShowSignin} />
+        <Navbar setShowSignin={setShowSignin} setShowFeedback={setShowFeedback}  />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cart" element={<Cart />} />

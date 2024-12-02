@@ -5,7 +5,7 @@ import { Link, NavLink } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 
 const Navbar = ({ setShowSignin }) => {
-  const [menu, setMenu] = useState("Menu");
+  const [menu, setMenu] = useState("Home");
 
   const { getTotalCartAmount } = useContext(StoreContext);
 
@@ -16,7 +16,7 @@ const Navbar = ({ setShowSignin }) => {
       </Link>
       <ul className="navbar-menu flex list-none gap-5 text-[#49557e] text-lg">
         <Link
-          to="/"
+          to='/'
           onClick={() => setMenu("Home")}
           className={menu === "Home" ? "active" : ""}
         >
@@ -30,11 +30,11 @@ const Navbar = ({ setShowSignin }) => {
           Menu
         </a>
         <a
-          href="#mobile"
-          onClick={() => setMenu("Mobile")}
-          className={menu === "Mobile" ? "active" : ""}
+          href="#feedback"
+          onClick={() => setShowFeedback(true)}
+          className={menu === "Feedback" ? "active" : ""}
         >
-          Mobile
+          Feedback
         </a>
         <a
           href="#about"
@@ -44,23 +44,23 @@ const Navbar = ({ setShowSignin }) => {
           About
         </a>
         <a
-          href="#contact"
+          href="#footer"
           onClick={() => setMenu("Contact")}
           className={menu === "Contact" ? "active" : ""}
         >
           Contact
         </a>
       </ul>
-      <div className="flex items-center gap-3 py-1">
+      <div className="navbar-right flex items-center gap-3 py-1">
         <img src={assets.search_icon} alt="" />
-        <div className="relative">
+        <div className="navbar-search-icon relative">
           <Link to="/cart">
             <img src={assets.basket_icon} alt="" />
           </Link>
           <div className="dot absolute min-w-2.5 min-h-2.5 bg-orange-500 rounded -top-2 -right-2 "></div>
         </div>
         <button onClick={() => setShowSignin(true)}>Sign In</button>
-        <button>Sign Up</button>
+        {/* <button >Sign Up</button> */}
       </div>
     </div>
   );

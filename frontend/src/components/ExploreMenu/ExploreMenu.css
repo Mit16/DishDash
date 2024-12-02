@@ -1,10 +1,29 @@
+.explore-menu{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.explore-menu h1{
+    color: #262626;
+    font-weight: 600;
+    font-size: max(2vw,24px);
+}
 .explore-menu-text{
     max-width: 60%;
     color: #808080;
 }
-
+.explore-menu-list{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    text-align: center;
+    margin: 20px 0px;
+    overflow: scroll;
+}
 .explore-menu-list::-webkit-scrollbar{
     display: none;
+
 }
 
 .explore-menu-list-item{

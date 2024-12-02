@@ -3,7 +3,7 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 
 const LoginPopup = ({ setShowSignin }) => {
-  const [currState, setCurrState] = useState("Sign Up");
+  const [currState, setCurrState] = useState("Sign In");
 
   return (
     <div className="signin-popup">
@@ -24,8 +24,11 @@ const LoginPopup = ({ setShowSignin }) => {
           )}
           <input type="text" placeholder="Email" required />
           <input type="password" placeholder="Password" required />
-          {currState === "Sign Up"? <input type="password" placeholder="Confirm Password" required /> : <></>}
-          
+          {currState === "Sign Up" ? (
+            <input type="password" placeholder="Confirm Password" required />
+          ) : (
+            <></>
+          )}
         </div>
         <button>
           {currState === "Sign Up" ? "Create new account" : "Sign In"}
@@ -36,11 +39,23 @@ const LoginPopup = ({ setShowSignin }) => {
         </div>
         {currState === "Sign In" ? (
           <p>
-            Create a new account  |  <span className="cursor-pointer font-semibold" onClick={()=> setCurrState("Sign Up")}>Click here</span>
+            Create a new account |{" "}
+            <span
+              className="cursor-pointer font-semibold"
+              onClick={() => setCurrState("Sign Up")}
+            >
+              Click here
+            </span>
           </p>
         ) : (
           <p>
-            Already have an account  |  <span className="cursor-pointer font-semibold" onClick={()=> setCurrState("Sign In")}>Sign In</span>
+            Already have an account |{" "}
+            <span
+              className="cursor-pointer font-semibold"
+              onClick={() => setCurrState("Sign In")}
+            >
+              Sign In
+            </span>
           </p>
         )}
       </form>
