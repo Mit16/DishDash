@@ -10,7 +10,7 @@ import FeedbackPopup from "./components/FeedbackPopup/FeedbackPopup";
 
 const App = () => {
   const [showSignin, setShowSignin] = useState(false);
-  const [showFeedback,setShowFeedback] = useState(true);
+  const [showFeedback,setShowFeedback] = useState(false);
 
   return (
     <>
