@@ -5,7 +5,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 
 
-const Navbar = ({ setShowSignin }) => {
+const Navbar = ({ setShowSignin, setShowFeedback }) => {
   const [menu, setMenu] = useState("Home");
   const { token, setToken } = useContext(StoreContext);
   const { getTotalCartAmount } = useContext(StoreContext);
@@ -38,11 +38,11 @@ const Navbar = ({ setShowSignin }) => {
           Menu
         </a>
         <a
-          href="#mobile"
-          onClick={() => setMenu("Mobile")}
-          className={menu === "Mobile" ? "active" : ""}
+          href="#feedback"
+          onClick={() => setShowFeedback(true)}
+          className={menu === "Feedback" ? "active" : ""}
         >
-          Mobile
+          Feedback
         </a>
         <a
           href="#about"
@@ -52,16 +52,16 @@ const Navbar = ({ setShowSignin }) => {
           About
         </a>
         <a
-          href="#contact"
+          href="#footer"
           onClick={() => setMenu("Contact")}
           className={menu === "Contact" ? "active" : ""}
         >
           Contact
         </a>
       </ul>
-      <div className="flex items-center gap-3 py-1">
+      <div className="navbar-right flex items-center gap-3 py-1">
         <img src={assets.search_icon} alt="" />
-        <div className="relative">
+        <div className="navbar-search-icon relative">
           <Link to="/cart">
             <img src={assets.basket_icon} alt="" />
           </Link>
@@ -70,7 +70,7 @@ const Navbar = ({ setShowSignin }) => {
         {!token ? (
           <>
             <button onClick={() => setShowSignin(true)}>Sign In</button>
-            <button>Sign Up</button>
+            {/* <button>Sign Up</button> */}
           </>
         ) : (
           <div className="navbar-profile">
