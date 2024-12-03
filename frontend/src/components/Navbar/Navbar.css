@@ -42,6 +42,7 @@ transition: 0.3s;
   
 }
 
+
 .navbar li{
   cursor: pointer;
 }
@@ -69,7 +70,7 @@ transition: 0.3s;
       gap: 30px;
   }
   .navbar-right img{
-      width: 22px;
+      width: 10px;
   }
   .navbar-right button{
       padding: 8px 25px;

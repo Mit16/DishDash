@@ -44,20 +44,21 @@ const registerUser = async (req, res) => {
       return res.json({ success: false, message: "User exists" });
     }
 
-    //validating email format & strong password
-    if (!validator.isEmail(email)) {
+    // Validate email format
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(email)) {
+      return res.json({ success: false, message: "Please enter a valid email" });
+    }
+
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    if (!passwordRegex.test(password)) {
       return res.json({
         success: false,
-        message: "Please enter a valid email",
+        message: "Password must be strong (8+ chars, include uppercase, lowercase, number, special char)",
       });
     }
 
-    if (password.length <= 8) {
-      return res.json({
-        success: false,
-        message: "Please enter a strong password",
-      });
-    }
 
     // password match
     if (password !== confirmPassword) {
@@ -80,7 +81,7 @@ const registerUser = async (req, res) => {
     res.json({ success: true, token });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: "Error" });
+    res.json({ success: false, message: "Server error occurred" });
   }
 };
 

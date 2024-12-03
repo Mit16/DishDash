@@ -4,7 +4,7 @@ import Home from "./pages/Home/Home";
 import Cart from "./pages/Cart/Cart";
 import PlaceOrder from "./pages/PlaceOrder/PlaceOrder";
 import Footer from "./components/Footer/Footer";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
 import FeedbackPopup from "./components/FeedbackPopup/FeedbackPopup";
 

@@ -37,13 +37,13 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
         >
           Menu
         </a>
-        <a
-          href="#feedback"
+        <Link
+          to='/feedback'
           onClick={() => setShowFeedback(true)}
           className={menu === "Feedback" ? "active" : ""}
         >
           Feedback
-        </a>
+        </Link>
         <a
           href="#about"
           onClick={() => setMenu("About")}

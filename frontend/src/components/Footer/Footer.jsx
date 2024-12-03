@@ -1,4 +1,3 @@
-
 import "./Footer.css";
 
 const Footer = () => {
@@ -8,10 +7,9 @@ const Footer = () => {
         <div className="footer-content-left">
           <img src="" alt="" />
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio
-            iste quae porro. Ea velit quam repellendus, maiores dolores vitae
-            reiciendis molestias rerum veniam, minima nihil voluptates dolor
-            nostrum. Rerum, ab!
+            Crafting a food delivery system so seamless, it'll have the devil
+            himself ordering snacks on the go! 🍕🚀 Driven by passion, powered
+            by tech, and served with excellence—your hunger, our mission!
           </p>
           <div className="footer-social-icons">
             <a href="#">
