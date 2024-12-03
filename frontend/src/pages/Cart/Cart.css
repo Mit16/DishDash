@@ -35,7 +35,7 @@
     margin-top: 80px;
     display: flex;
     justify-content: space-between;
-    gap: max(12pw,20px);
+    gap: max(12vw,20px);
 }
 
 .cart-total{

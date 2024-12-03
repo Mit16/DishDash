@@ -8,8 +8,9 @@ const Footer = () => {
           <img src="" alt="" />
           <p>
             Crafting a food delivery system so seamless, it'll have the devil
-            himself ordering snacks on the go! 🍕🚀 Driven by passion, powered
-            by tech, and served with excellence—your hunger, our mission!
+            himself ordering snacks on the go! 🍕🚀 <br/>
+            Driven by passion, powered
+            by tech, and served with excellence<br/>—your hunger, our mission!
           </p>
           <div className="footer-social-icons">
             <a href="#">

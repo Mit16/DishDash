@@ -4,7 +4,6 @@ import { assets } from "../../assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 
-
 const Navbar = ({ setShowSignin, setShowFeedback }) => {
   const [menu, setMenu] = useState("Home");
   const { token, setToken } = useContext(StoreContext);
@@ -38,7 +37,7 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
           Menu
         </a>
         <Link
-          to='/feedback'
+          to="/feedback"
           onClick={() => setShowFeedback(true)}
           className={menu === "Feedback" ? "active" : ""}
         >
@@ -65,7 +64,13 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
           <Link to="/cart">
             <img src={assets.basket_icon} alt="" />
           </Link>
-          <div className="dot absolute min-w-2.5 min-h-2.5 bg-orange-500 rounded -top-2 -right-2 "></div>
+          <div
+            className={
+              getTotalCartAmount() === 0
+                ? ""
+                : "dot absolute min-w-2.5 min-h-2.5 bg-orange-500 rounded -top-2 -right-2"
+            }
+          ></div>
         </div>
         {!token ? (
           <>
