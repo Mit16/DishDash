@@ -4,13 +4,11 @@ import { StoreContext } from "../../context/StoreContext";
 import { isRouteErrorResponse } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-
 const Cart = () => {
   const { cartItems, food_list, removeFromCart, getTotalCartAmount } =
     useContext(StoreContext);
 
   const navigate = useNavigate();
-
 
   return (
     <div className="cart">
@@ -64,8 +62,15 @@ const Cart = () => {
               <b>₹ {getTotalCartAmount() + 40}</b>
             </div>
           </div>
-
-          <button onClick={() => navigate("/order")}>
+          <button
+            onClick={() => navigate("/order")}
+            disabled={getTotalCartAmount() === 0}
+            className={`px-4 py-2 text-white rounded ${
+              getTotalCartAmount() === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-orange-500"
+            }`}
+          >
             PROCEED TO CHECKOUT
           </button>
         </div>

@@ -3,6 +3,7 @@ import "./Navbar.css";
 import { assets } from "../../assets/assets";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
+import main_logo from "../../assets/main_logo.png";
 
 const Navbar = ({ setShowSignin, setShowFeedback }) => {
   const [menu, setMenu] = useState("Home");
@@ -19,7 +20,7 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
   return (
     <div className="navbar px-5 py-0 flex justify-between items-center">
       <Link to="/">
-        <img src={assets.logo} alt="" className="logo w-32" />
+        <img src={main_logo} alt="" className="logo w-32 h-14 px-3.5" />
       </Link>
       <ul className="navbar-menu flex list-none gap-5 text-[#49557e] text-lg">
         <Link
@@ -82,7 +83,11 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
             <img src={assets.profile_icon} alt="" />
             <ul className="nav-profile-dropdown">
               <li>
-                <img src={assets.bag_icon} alt="" />
+                <img
+                  onClick={() => navigate("/myorders")}
+                  src={assets.bag_icon}
+                  alt=""
+                />
                 <p>Orders</p>
               </li>
               {/* <hr /> */}
