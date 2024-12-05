@@ -9,7 +9,7 @@ const feedbackrouter = express.Router();
 // Route to add feedback
 feedbackrouter.post("/", addFeedback);
 
-// Route to get all feedback (optional, for admin)
+// Route to get all feedback (for admin)
 feedbackrouter.get("/", getFeedbacks);
 
 export default feedbackrouter;

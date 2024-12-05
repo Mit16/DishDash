@@ -6,12 +6,11 @@ import List from "./pages/List/List";
 import Orders from "./pages/Orders/Orders";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import "dotenv/config";
+import Feedback from "./pages/Feedback/Feedback";
 
 const App = () => {
   // const URL = import.meta.env.VITE_ADMIN_PAGE_URL;
   const apiURL = import.meta.env.VITE_ADMIN_PAGE_URL; // Access environment variable
-  
 
   return (
     <div>
@@ -24,6 +23,7 @@ const App = () => {
           <Route path="/add" element={<Add apiURL={apiURL} />} />
           <Route path="/list" element={<List apiURL={apiURL} />} />
           <Route path="/orders" element={<Orders apiURL={apiURL} />} />
+          <Route path="/feedback" element={<Feedback apiURL={apiURL} />} />
         </Routes>
       </div>
     </div>
