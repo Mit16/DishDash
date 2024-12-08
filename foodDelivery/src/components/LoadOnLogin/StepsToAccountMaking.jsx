@@ -1,7 +1,7 @@
 // src/JoinZomato.js
-import React from 'react';
+import React from "react";
 
-const Hia = () => {
+const StepsToAccountMaking = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <h1 className="text-4xl font-bold mb-8">Join FoodHub in 3 Easy Steps</h1>
@@ -26,4 +26,4 @@ const Hia = () => {
   );
 };
 
-export default Hia;
+export default StepsToAccountMaking;
