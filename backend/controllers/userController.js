@@ -1,32 +1,39 @@
 import userModel from "../models/userModel.js";
+import deliveryGuyModel from "../models/deliveryModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
 
 //login user
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, accountType } = req.body;
+
   try {
-    const user = await userModel.findOne({ email });
+    const Model = getModel(accountType);
+    if (!Model) {
+      return res.json({ success: false, message: "Invalid account type" });
+    }
+
+    const user = await Model.findOne({ email });
 
     if (!user) {
       return res.json({
         success: false,
-        message: "User doesn't exist. Create a account!",
+        message: "User doesn't exist. Create an account!",
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.json({ success: false, message: "Invalid Credentials" });
+      return res.json({ success: false, message: "Invalid credentials" });
     }
 
     const token = createToken(user._id);
     res.json({ success: true, token });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error(error);
+    res.json({ success: false, message: "Server error occurred" });
   }
 };
 
@@ -36,29 +43,54 @@ const createToken = (id) => {
 
 //register user
 const registerUser = async (req, res) => {
-  const { name, password, confirmPassword, email } = req.body;
+  const { fullname, password, confirmPassword, email, accountType } = req.body;
+
+  // Log values for debugging
+  // console.log("Password:", password);
+  // console.log("Confirm Password:", confirmPassword);
+
   try {
+    // Validate required fields dynamically
+    if (
+      !fullname ||
+      !fullname.firstname ||
+      !email ||
+      !password ||
+      !accountType
+    ) {
+      return res.json({ success: false, message: "Missing required fields" });
+    }
+
     //checking if the user exists
-    const exists = await userModel.findOne({ email });
+    const Model = getModel(accountType);
+    if (!Model) {
+      return res.json({ success: false, message: "Invalid account type" });
+    }
+
+    const exists = await Model.findOne({ email });
     if (exists) {
-      return res.json({ success: false, message: "User exists" });
+      return res.json({ success: false, message: "Account already exists" });
     }
 
     // Validate email format
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!emailRegex.test(email)) {
-      return res.json({ success: false, message: "Please enter a valid email" });
-    }
-
-    // Validate password strength
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-    if (!passwordRegex.test(password)) {
       return res.json({
         success: false,
-        message: "Password must be strong (8+ chars, include uppercase, lowercase, number, special char)",
+        message: "Please enter a valid email",
       });
     }
 
+    // Validate password strength
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.json({
+        success: false,
+        message:
+          "Password must be strong (8+ chars, include uppercase, lowercase, number, special char)",
+      });
+    }
 
     // password match
     if (password !== confirmPassword) {
@@ -69,20 +101,34 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new userModel({
-      name: name,
-      email: email,
+    // Create a new user with the correctly structured data
+
+    const newUser = new Model({
+      fullname: {
+        firstname: fullname.firstname,
+        lastname: fullname.lastname || "",
+      },
+      accountType,
+      email,
       password: hashedPassword,
     });
 
     const user = await newUser.save();
 
+    //Generate JWT token
     const token = createToken(user._id);
     res.json({ success: true, token });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: "Server error occurred" });
   }
+};
+
+// Helper function to determine the model based on accountType
+const getModel = (accountType) => {
+  if (accountType === "Consumer") return userModel;
+  if (accountType === "Delivery") return deliveryGuyModel;
+  return null;
 };
 
 export { loginUser, registerUser };

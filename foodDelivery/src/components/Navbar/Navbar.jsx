@@ -1,3 +1,4 @@
+import { Link, NavLink } from "react-router-dom";
 import main_logo from "../../assets/main_logo.png";
 import "./Navbar.css";
 
@@ -8,16 +9,10 @@ const Navbar = () => {
         <img src={main_logo} className="main-logo" alt="" />
       </div>
       <div>
-        <ul>
-          <li>Home</li>
-          <li>About</li>
-          <li>Contact</li>
-        </ul>
-        {/* {currentState ? (
-          <button onClick={setCurrentState((prev) => !prev)}>Sign In</button>
-        ) : (
-          <button onClick={setCurrentState((prev) => !prev)}>Register</button>
-        )} */}
+        <NavLink to="/home">Home</NavLink>
+        <NavLink to="/orders">Orders</NavLink>
+        <NavLink to="/earnings">Earnings</NavLink>
+        <NavLink to="/dashboard">Dashboard</NavLink>
       </div>
     </nav>
   );

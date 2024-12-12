@@ -9,16 +9,31 @@ const LoginPopup = ({ setShowSignin }) => {
 
   const [currState, setCurrState] = useState("Sign In");
   const [data, setData] = useState({
-    name: "",
+    fullname: {
+      firstname: "",
+      lastname: "",
+    },
     email: "",
     password: "",
     confirmPassword: "",
+    accountType: "Consumer",
   });
 
   const onChangeSubmitHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
+    const { name, value } = event.target;
+
+    if (name.includes("fullname.")) {
+      const key = name.split(".")[1];
+      setData((prevData) => ({
+        ...prevData,
+        fullname: {
+          ...prevData.fullname,
+          [key]: value,
+        },
+      }));
+    } else {
+      setData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const onSignIn = async (event) => {
@@ -57,14 +72,24 @@ const LoginPopup = ({ setShowSignin }) => {
           {currState === "Sign In" ? (
             <></>
           ) : (
-            <input
-              type="text"
-              name="name"
-              onChange={onChangeSubmitHandler}
-              value={data.name}
-              placeholder="Name"
-              required
-            />
+            <>
+              <input
+                type="text"
+                name="fullname.firstname"
+                onChange={onChangeSubmitHandler}
+                value={data.fullname.firstname}
+                placeholder="Enter first name"
+                required
+              />
+              <input
+                type="text"
+                name="fullname.lastname"
+                onChange={onChangeSubmitHandler}
+                value={data.fullname.lastname}
+                placeholder="Enter last name"
+                required
+              />
+            </>
           )}
           <input
             type="email"

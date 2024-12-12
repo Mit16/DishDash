@@ -1,0 +1,41 @@
+.manage-food-container {
+    padding: 20px;
+    background-color: #fff;
+  }
+  
+  .food-form input, .food-form select {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid tomato;
+    border-radius: 5px;
+  }
+  
+  button {
+    background-color: tomato;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .food-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .food-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .food-list button {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  

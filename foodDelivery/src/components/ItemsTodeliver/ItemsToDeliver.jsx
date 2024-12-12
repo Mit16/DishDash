@@ -1,46 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import "./ItemsToDeliver.css";
-import axios from "axios";
-import { toast } from "react-toastify";
-import parcel_icon from '../../assets/parcel_icon.png'
+import parcel_icon from "../../assets/parcel_icon.png";
 import { useNavigate } from "react-router-dom";
+import { DeliveryContext } from "../../context/Delivery.context";
 
 const ItemsToDeliver = () => {
-  //temp
-  const apiURL = "http://localhost:4000";
-    const navigate = useNavigate();
-
-  const [orders, setOrders] = useState([]);
-
-  const fetchAllOrders = async () => {
-    const response = await axios.get(apiURL + "/api/order/list");
-    if (response.data.success) {
-      setOrders(response.data.data);
-      console.log(response.data.data);
-    } else {
-      toast.error("Unable to get orders list");
-    }
-  };
-
-  const statusHandler = async (event, orderId) => {
-    const response = await axios.post(apiURL + "/api/orders/status", {
-      orderId,
-      status: event.target.value,
-    });
-    if (response.data.success) {
-      await fetchAllOrders();
-    }
-  };
-
-  useEffect(() => {
-    fetchAllOrders();
-  }, []);
+  const navigate = useNavigate();
+  const { currentDelivery, statusHandler } = useContext(DeliveryContext);
 
   return (
     <div className="order add">
       <h3>Order Page</h3>
       <div className="order-list">
-        {orders.map((order, index) => (
+        {console.log(currentDelivery)}
+        {currentDelivery.map((order, index) => (
           <div key={index} className="order-item">
             <img src={parcel_icon} alt="" />
             <div>
@@ -83,7 +56,7 @@ const ItemsToDeliver = () => {
           </div>
         ))}
       </div>
-      <button onClick={()=> navigate("/orders")}>View orders History</button>
+      <button onClick={() => navigate("/orders")}>View orders History</button>
     </div>
   );
 };

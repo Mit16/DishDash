@@ -1,78 +1,154 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
+import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { DeliveryProcess, StepsToAccountMaking } from "../LoadOnLogin";
+import { DeliveryContext } from "../../context/Delivery.context";
 
-const Login = ({ setCurrentState }) => {
+const Login = () => {
   const navigate = useNavigate();
 
+  const { apiURL, setToken } = useContext(DeliveryContext);
+  const [currState, setCurrState] = useState("Sign In");
   const [data, setData] = useState({
+    fullname: {
+      firstname: "",
+      lastname: "",
+    },
     email: "",
     password: "",
+    confirmPassword: "",
+    accountType: "Delivery",
   });
 
   const onChangeSubmitHandler = (event) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
+    const { name, value } = event.target;
+
+    if (name.includes("fullname.")) {
+      const key = name.split(".")[1];
+      setData((prevData) => ({
+        ...prevData,
+        fullname: {
+          ...prevData.fullname,
+          [key]: value,
+        },
+      }));
+    } else {
+      setData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(data);
-    navigate("/home");
+    let newURL = apiURL;
+    if (currState === "Sign In") {
+      newURL += "/api/user/login";
+    } else {
+      newURL += "/api/user/register";
+    }
+
+    const response = await axios.post(newURL, data);
+
+    if (response.data.success) {
+      setToken(response.data.token);
+      //saving the token in local storage
+      localStorage.setItem("Token", response.data.token);
+    } else {
+      alert(response.data.message);
+    }
+
+    if (response.data.success) {
+      navigate("/dashboard");
+    } else {
+      setCurrState("Sign Up");
+    }
     // Handle login logic here
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
-        <div className="mb-4">
-          {/* <label className="block text-gray-700">Email : </label> */}
+    <div>
+      <form onSubmit={handleSubmit} className="signin-popup-container">
+        <div className="signin-popup-inputs">
+          {currState === "Sign In" ? (
+            <></>
+          ) : (
+            <>
+              <input
+                type="text"
+                name="fullname.firstname"
+                onChange={onChangeSubmitHandler}
+                value={data.fullname.firstname}
+                placeholder="Enter first name"
+                required
+              />
+              <input
+                type="text"
+                name="fullname.lastname"
+                onChange={onChangeSubmitHandler}
+                value={data.fullname.lastname}
+                placeholder="Enter last name"
+                required
+              />
+            </>
+          )}
           <input
             type="email"
             name="email"
-            placeholder="Email"
             onChange={onChangeSubmitHandler}
             value={data.email}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            placeholder="Email"
             required
           />
-        </div>
-        <div className="mb-4">
-          {/* <label className="block text-gray-700">Password</label> */}
           <input
             type="password"
             name="password"
-            placeholder="Password"
             onChange={onChangeSubmitHandler}
             value={data.password}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded"
+            placeholder="Password"
             required
           />
+          {currState === "Sign Up" ? (
+            <input
+              type="password"
+              name="confirmPassword"
+              onChange={onChangeSubmitHandler}
+              value={data.confirmPassword}
+              placeholder="Confirm Password"
+              required
+            />
+          ) : (
+            <></>
+          )}
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-        >
-          Sign In
+        <div className="signin-popup-condition">
+          <input type="checkbox" required />
+          <p>Agree to Terms & Conditions</p>
+        </div>
+        <button type="submit">
+          {currState === "Sign Up" ? "Create new account" : "Sign In"}
         </button>
-        <div>
+        {currState === "Sign In" ? (
           <p>
             Create a new account |{" "}
             <span
               className="cursor-pointer font-semibold"
-              onClick={() => navigate("/register")}
+              onClick={() => setCurrState("Sign Up")}
             >
               Click here
             </span>
           </p>
-        </div>
+        ) : (
+          <p>
+            Already have an account |{" "}
+            <span
+              className="cursor-pointer font-semibold"
+              onClick={() => setCurrState("Sign In")}
+            >
+              Sign In
+            </span>
+          </p>
+        )}
       </form>
-
       {/* Additional componentes just for show */}
       <DeliveryProcess />
       <StepsToAccountMaking />

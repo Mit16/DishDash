@@ -1,0 +1,49 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: tomato;
+    padding: 10px 20px;
+  }
+  
+  .left-side {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .username {
+    color: white;
+  }
+  
+  .right-side {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .restaurant-name {
+    color: white;
+    font-size: 18px;
+  }
+  
+  .buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .navbar-btn {
+    background-color: white;
+    color: tomato;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  

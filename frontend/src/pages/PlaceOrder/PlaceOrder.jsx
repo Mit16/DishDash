@@ -20,6 +20,8 @@ const PlaceOrder = () => {
     phone: "",
   });
 
+  const [showPopup, setShowPopup] = useState(false);
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -39,17 +41,17 @@ const PlaceOrder = () => {
     let orderData = {
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + 2,
+      deliveryAmount: Math.max(getTotalCartAmount() / 10, 40),
+      amount: getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40),
     };
     let response = await axios.post(URL + "/api/order/place", orderData, {
       headers: { token },
     });
-    // if (response.data.success) {
-    //   const { session_url } = response.data;
-    //   window.location.replace(session_url);
-    // } else {
-    //   alert("Error");
-    // }
+    if (response.data.success) {
+      setShowPopup(true); // Show popup when order is placed successfully
+    } else {
+      alert("Error placing order");
+    }
   };
 
   const navigate = useNavigate();
@@ -63,111 +65,124 @@ const PlaceOrder = () => {
   }, []);
 
   return (
-    <form onSubmit={placeOrder} className="place-order">
-      <div className="place-order-left">
-        <p className="title">Delivery Infomation</p>
-        <div className="multi-fields">
-          <input
-            required
-            type="text"
-            name="firstName" // Corrected to match the state key
-            onChange={onChangeHandler}
-            value={data.firstName}
-            placeholder="First Name"
-          />
-          <input
-            required
-            type="text"
-            name="lastName" // Corrected to match the state key
-            onChange={onChangeHandler}
-            value={data.lastName}
-            placeholder="Last Name"
-          />
-        </div>
-        <input
-          required
-          type="email"
-          name="email"
-          onChange={onChangeHandler}
-          value={data.email}
-          placeholder="Email Id"
-        />
-        <input
-          required
-          type="text"
-          name="street"
-          onChange={onChangeHandler}
-          value={data.street}
-          placeholder="Street"
-        />
-        <div className="multi-fields">
-          <input
-            required
-            type="text"
-            name="city"
-            onChange={onChangeHandler}
-            value={data.city}
-            placeholder="City"
-          />
-          <input
-            required
-            type="text"
-            name="state"
-            onChange={onChangeHandler}
-            value={data.state}
-            placeholder="State"
-          />
-        </div>
-        <div className="multi-fields">
-          <input
-            required
-            type="text"
-            name="zipcode"
-            onChange={onChangeHandler}
-            value={data.zipcode}
-            placeholder="Zip-Code"
-          />
-          <input
-            required
-            type="text"
-            name="country"
-            onChange={onChangeHandler}
-            value={data.country}
-            placeholder="country"
-          />
-        </div>
-        <input
-          required
-          type="text"
-          name="phone"
-          onChange={onChangeHandler}
-          value={data.phone}
-          placeholder="Phone"
-        />
-      </div>
-      <div className="place-order-right">
-        <div className="cart-total">
-          <h2>Cart Total</h2>
-          <div>
-            <div className="cart-total-details">
-              <p>Subtotal</p>
-              <p>₹ {getTotalCartAmount()}</p>
-            </div>
-            <hr />
-            <div className="cart-total-details">
-              <p>Delivery Fee</p>
-              <p>₹ {40}</p>
-            </div>
-            <hr />
-            <div className="cart-total-details">
-              <b>Total</b>
-              <b>₹ {getTotalCartAmount() + 40}</b>
-            </div>
+    <>
+      {showPopup && (
+        <div className="popup">
+          <div className="popup-content">
+            <div className="popup-icon">✔</div>
+            <p>Order Placed Successfully!</p>
+            <button className="popup-close" onClick={() => setShowPopup(false)}>
+              Close
+            </button>
           </div>
-          <button type="submit">PROCEED TO PAYMENT</button>
         </div>
-      </div>
-    </form>
+      )}
+      <form onSubmit={placeOrder} className="place-order">
+        <div className="place-order-left">
+          <p className="title">Delivery Information</p>
+          <div className="multi-fields">
+            <input
+              required
+              type="text"
+              name="firstName"
+              onChange={onChangeHandler}
+              value={data.firstName}
+              placeholder="First Name"
+            />
+            <input
+              required
+              type="text"
+              name="lastName"
+              onChange={onChangeHandler}
+              value={data.lastName}
+              placeholder="Last Name"
+            />
+          </div>
+          <input
+            required
+            type="email"
+            name="email"
+            onChange={onChangeHandler}
+            value={data.email}
+            placeholder="Email Id"
+          />
+          <input
+            required
+            type="text"
+            name="street"
+            onChange={onChangeHandler}
+            value={data.street}
+            placeholder="Street"
+          />
+          <div className="multi-fields">
+            <input
+              required
+              type="text"
+              name="city"
+              onChange={onChangeHandler}
+              value={data.city}
+              placeholder="City"
+            />
+            <input
+              required
+              type="text"
+              name="state"
+              onChange={onChangeHandler}
+              value={data.state}
+              placeholder="State"
+            />
+          </div>
+          <div className="multi-fields">
+            <input
+              required
+              type="text"
+              name="zipcode"
+              onChange={onChangeHandler}
+              value={data.zipcode}
+              placeholder="Zip-Code"
+            />
+            <input
+              required
+              type="text"
+              name="country"
+              onChange={onChangeHandler}
+              value={data.country}
+              placeholder="Country"
+            />
+          </div>
+          <input
+            required
+            type="text"
+            name="phone"
+            onChange={onChangeHandler}
+            value={data.phone}
+            placeholder="Phone"
+          />
+        </div>
+        <div className="place-order-right">
+          <div className="cart-total">
+            <h2>Cart Total</h2>
+            <div>
+              <div className="cart-total-details">
+                <p>Subtotal</p>
+                <p>₹ {getTotalCartAmount()}</p>
+              </div>
+              <hr />
+              <div className="cart-total-details">
+                <p>Delivery Fee</p>
+                <p>₹ {Math.max(getTotalCartAmount() / 10, 40)}</p>
+              </div>
+              <hr />
+              <div className="cart-total-details">
+                <b>Total</b>
+                <b>₹ {getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40)}</b>
+              </div>
+            </div>
+            <button type="submit">PLACE ORDER</button>
+          </div>
+        </div>
+      </form>
+    </>
   );
 };
 

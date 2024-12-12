@@ -54,12 +54,12 @@ const Cart = () => {
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
-              <p>₹ {40}</p>
+              <p>₹ {Math.max(getTotalCartAmount() / 10, 40)}</p>
             </div>
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>₹ {getTotalCartAmount() + 40}</b>
+              <b>₹ {getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40)}</b>
             </div>
           </div>
           <button

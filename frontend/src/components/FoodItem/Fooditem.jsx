@@ -7,9 +7,7 @@ import { StoreContext } from "../../context/StoreContext";
 const Fooditem = ({ id, name, price, descripion, image }) => {
   // const { indianPrice } = useContext(PriceContext);
 
-  const indianPrice = (price) => {
-    return price * 30;
-  };
+  
 
   const { cartItems, addToCart, removeFromCart } = useContext(StoreContext);
 
