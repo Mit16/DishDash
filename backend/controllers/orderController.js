@@ -1,6 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
-
+import deliveryGuyModel from "../models/deliveryModel.js";
 
 //Placing user order from frontend
 const placeOrder = async (req, res) => {
@@ -26,6 +26,52 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const assignOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    // Fetch all delivery boys
+    const deliveryBoys = await deliveryGuyModel.find({
+      accountType: "Delivery",
+    });
+
+    if (deliveryBoys.length === 0) {
+      return res.json({
+        success: false,
+        message: "No delivery boys available.",
+      });
+    }
+
+    // Randomly select a delivery boy
+    const assignedDeliveryBoy =
+      deliveryBoys[Math.floor(Math.random() * deliveryBoys.length)];
+
+    // Update the order status and assigned delivery boy details
+    await orderModel.findByIdAndUpdate(orderId, {
+      status: "Assigned",
+      deliveryBoy: {
+        name: `${assignedDeliveryBoy.fullname.firstname} ${assignedDeliveryBoy.fullname.lastname}`,
+        phone: assignedDeliveryBoy.phoneNumber,
+        id: assignedDeliveryBoy._id,
+      },
+    });
+
+    // Add the order to the delivery boy's assigned orders
+    await userModel.findByIdAndUpdate(assignedDeliveryBoy._id, {
+      $push: { ordersAssigned: orderId },
+    });
+
+    res.json({
+      success: true,
+      message: "Order assigned successfully.",
+      deliveryBoy: assignedDeliveryBoy,
+    });
+  } catch (error) {
+    console.error("Error assigning order:", error);
+    res.json({ success: false, message: "Error assigning order." });
+  }
+};
+
 //users order for frontend
 
 const userOrders = async (req, res) => {
@@ -33,7 +79,7 @@ const userOrders = async (req, res) => {
     const orders = await orderModel.find({ userId: req.body.userId });
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log("Unable to fetch orders");
+    console.error("Unable to fetch orders:", error);
     res.json({ success: false, message: "Error" });
   }
 };
@@ -62,4 +108,4 @@ const updateStatus = async (req, res) => {
   }
 };
 
-export { placeOrder, userOrders, listOrders, updateStatus };
+export { placeOrder, userOrders, listOrders, updateStatus, assignOrder };

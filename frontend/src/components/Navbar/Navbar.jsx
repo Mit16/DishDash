@@ -82,14 +82,10 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
           <div className="navbar-profile">
             <img src={assets.profile_icon} alt="" />
             <ul className="nav-profile-dropdown">
-              <li>
-                <img
-                  onClick={() => navigate("/myorders")}
-                  src={assets.bag_icon}
-                  alt=""
-                />
+              <Link to="/myorders" className="flex items-center gap-2">
+                <img src={assets.bag_icon} alt="Orders" />
                 <p>Orders</p>
-              </li>
+              </Link>
               {/* <hr /> */}
               <li onClick={logout}>
                 <img src={assets.logout_icon} alt="" />

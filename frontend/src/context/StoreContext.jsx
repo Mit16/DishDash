@@ -10,7 +10,7 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
 
   const [token, setToken] = useState("");
-
+  const [deliveryGuy, setDeliveryGuy] = useState([]);
   const [cartItems, setCartItems] = useState({});
 
   const addToCart = async (itemId) => {
@@ -64,6 +64,36 @@ const StoreContextProvider = (props) => {
     setCartItems(response.data.cartData);
   };
 
+  const assignOrder = async (orderId) => {
+    try {
+      // Call the API to assign the order
+      const response = await axios.post(
+        URL + "/api/order/assignOrder",
+        { orderId },
+        { headers: { token } } // Include the token in the headers
+      );
+
+      if (response.data.success) {
+        const deliveryBoy = response.data.deliveryBoy;
+
+        // Log or display the assigned delivery boy's details to the consumer
+        console.log("Order assigned to:", deliveryBoy);
+        setDeliveryGuy({
+          name: `${deliveryBoy.fullname.firstname} ${deliveryBoy.fullname.lastname}`,
+          phone: deliveryBoy.phoneNumber,
+        });
+        // Example: Show delivery details to the consumer
+        alert(
+          `Your order has been assigned to ${deliveryBoy.fullname.firstname} ${deliveryBoy.fullname.lastname}. Contact: ${deliveryBoy.phoneNumber}`
+        );
+      } else {
+        console.error("Error assigning order:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error assigning order:", error);
+    }
+  };
+
   //to store the token and prevent the logout when refreshed problem
   useEffect(() => {
     async function loadData() {
@@ -86,6 +116,8 @@ const StoreContextProvider = (props) => {
     getTotalCartAmount,
     token,
     setToken,
+    assignOrder,
+    deliveryGuy,
   };
 
   return (

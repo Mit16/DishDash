@@ -1,38 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import "./OrdersHistory.css";
-import axios from "axios";
-import { toast } from "react-toastify";
 import parcel_icon from "../../assets/parcel_icon.png";
+import { DeliveryContext } from "../../context/Delivery.context";
 
 const OrdersHistory = () => {
-  //temp
-  const apiURL = "http://localhost:4000";
-
-  const [orders, setOrders] = useState([]);
-
-  const fetchAllOrders = async () => {
-    const response = await axios.get(apiURL + "/api/order/list");
-    if (response.data.success) {
-      setOrders(response.data.data);
-      console.log(response.data.data);
-    } else {
-      toast.error("Unable to get orders list");
-    }
-  };
-
-  const statusHandler = async (event, orderId) => {
-    const response = await axios.post(apiURL + "/api/orders/status", {
-      orderId,
-      status: event.target.value,
-    });
-    if (response.data.success) {
-      await fetchAllOrders();
-    }
-  };
-
-  useEffect(() => {
-    fetchAllOrders();
-  }, []);
+  const { orders } = useContext(DeliveryContext);
 
   return (
     <div className="order add">
@@ -70,14 +42,8 @@ const OrdersHistory = () => {
             </div>
             <p>Items : {order.items.length}</p>
             <p>₹ {order.amount}</p>
-            <select
-              onChange={(event) => statusHandler(event, order._id)}
-              value={order.status}
-            >
-              <option value="Food Processing">Food Processing</option>
-              <option value="Out for delivery">Out for delivery</option>
-              <option value="Delivered">Delivered</option>
-            </select>
+            <p>₹ {order.deliveryAmount}</p>
+            <p>{order.status}</p>
           </div>
         ))}
       </div>

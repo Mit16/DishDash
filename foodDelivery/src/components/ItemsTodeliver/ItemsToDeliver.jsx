@@ -6,56 +6,28 @@ import { DeliveryContext } from "../../context/Delivery.context";
 
 const ItemsToDeliver = () => {
   const navigate = useNavigate();
-  const { currentDelivery, statusHandler } = useContext(DeliveryContext);
+  const { assignedOrders } = useContext(DeliveryContext);
 
   return (
     <div className="order add">
-      <h3>Order Page</h3>
-      <div className="order-list">
-        {console.log(currentDelivery)}
-        {currentDelivery.map((order, index) => (
-          <div key={index} className="order-item">
-            <img src={parcel_icon} alt="" />
-            <div>
-              <p className="order-item-food">
-                {order.items.map((item, index) => {
-                  if (index === order.items.length - 1) {
-                    return item.name + " x " + item.quantity;
-                  } else {
-                    return item.name + " x " + item.quantity + ", ";
-                  }
-                })}
+      <div>
+        <h2>Assigned Orders</h2>
+        {assignedOrders.length > 0 ? (
+          assignedOrders.map((order) => (
+            <div key={order._id}>
+              <p>Order ID: {order._id}</p>
+              <p>Amount: ₹{order.amount}</p>
+              <p>
+                Delivery Address: {order.address.street}, {order.address.city}
               </p>
-              <p className="order-item-name">
-                {order.address.firstName + " " + order.address.lastName}
-              </p>
-              <div className="order-item-address">
-                <p>{order.address.street + ","}</p>
-                <p>
-                  {order.address.city +
-                    ", " +
-                    order.address.state +
-                    ", " +
-                    order.address.country +
-                    ", " +
-                    order.address.zipcode}
-                </p>
-              </div>
-              <p className="order-item-phone">{order.address.phone}</p>
+              <p>Status: {order.status}</p>
             </div>
-            <p>Items : {order.items.length}</p>
-            <p>₹ {order.amount}</p>
-            <select
-              onChange={(event) => statusHandler(event, order._id)}
-              value={order.status}
-            >
-              <option value="Food Processing">Food Processing</option>
-              <option value="Out for delivery">Out for delivery</option>
-              <option value="Delivered">Delivered</option>
-            </select>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p>No assigned orders.</p>
+        )}
       </div>
+
       <button onClick={() => navigate("/orders")}>View orders History</button>
     </div>
   );

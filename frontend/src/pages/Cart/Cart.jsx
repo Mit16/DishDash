@@ -27,7 +27,7 @@ const Cart = () => {
           if (cartItems[item._id] > 0) {
             return (
               <>
-                <div className="cart-items-title cart-items-item">
+                <div key={index} className="cart-items-title cart-items-item">
                   <img src={item.image} alt="" />
                   <p>{item.name}</p>
                   <p>₹ {item.price}</p>
@@ -59,7 +59,10 @@ const Cart = () => {
             <hr />
             <div className="cart-total-details">
               <b>Total</b>
-              <b>₹ {getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40)}</b>
+              <b>
+                ₹{" "}
+                {getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40)}
+              </b>
             </div>
           </div>
           <button

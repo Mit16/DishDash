@@ -5,8 +5,15 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, token, food_list, cartItems, URL } =
-    useContext(StoreContext);
+  const {
+    getTotalCartAmount,
+    setCartItems,
+    token,
+    food_list,
+    cartItems,
+    URL,
+    assignOrder,
+  } = useContext(StoreContext);
 
   const [data, setData] = useState({
     firstName: "",
@@ -48,7 +55,12 @@ const PlaceOrder = () => {
       headers: { token },
     });
     if (response.data.success) {
-      setShowPopup(true); // Show popup when order is placed successfully
+      setShowPopup(true);
+      setCartItems({});
+
+      // Assign order to a delivery boy
+      const orderId = response.data.orderId; // Ensure the backend returns the orderId
+      await assignOrder(orderId);
     } else {
       alert("Error placing order");
     }
@@ -175,10 +187,19 @@ const PlaceOrder = () => {
               <hr />
               <div className="cart-total-details">
                 <b>Total</b>
-                <b>₹ {getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40)}</b>
+                <b>
+                  ₹{" "}
+                  {getTotalCartAmount() +
+                    Math.max(getTotalCartAmount() / 10, 40)}
+                </b>
               </div>
             </div>
-            <button type="submit">PLACE ORDER</button>
+            <button
+              className=" bg-orange-500 text-white font-semibold"
+              type="submit"
+            >
+              PLACE ORDER
+            </button>
           </div>
         </div>
       </form>

@@ -7,6 +7,8 @@ import "dotenv/config";
 import cartRouter from "./routes/cartRoute.js";
 import feedbackrouter from "./routes/feedbackRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import deliveryRouter from "./routes/deliveryRoute.js";
+// import "./utils/ceonJobs.js"
 
 //app config
 const app = express();
@@ -23,9 +25,10 @@ connectDB();
 app.use("/api/food", foodRouter);
 app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
+app.use("/api/delivery", deliveryRouter);
 app.use("/api/cart", cartRouter);
-app.use("/api/order",orderRouter);
-app.use("/api/feedback",feedbackrouter);
+app.use("/api/order", orderRouter);
+app.use("/api/feedback", feedbackrouter);
 
 app.get("/", (req, res) => {
   res.send("API Working");
