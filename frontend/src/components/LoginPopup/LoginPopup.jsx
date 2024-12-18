@@ -16,7 +16,7 @@ const LoginPopup = ({ setShowSignin }) => {
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "Consumer",
+    accountType: "customer",
   });
 
   const onChangeSubmitHandler = (event) => {

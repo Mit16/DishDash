@@ -8,7 +8,7 @@ import { DeliveryContext } from "../../context/Delivery.context";
 const Login = () => {
   const navigate = useNavigate();
 
-  const { apiURL, setToken } = useContext(DeliveryContext);
+  const { apiURL, setToken, Signin } = useContext(DeliveryContext);
   const [currState, setCurrState] = useState("Sign In");
   const [data, setData] = useState({
     fullname: {
@@ -18,7 +18,7 @@ const Login = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "Delivery",
+    accountType: "deliveryAgent",
   });
 
   const onChangeSubmitHandler = (event) => {
@@ -38,7 +38,7 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     let newURL = apiURL;
     if (currState === "Sign In") {
@@ -50,9 +50,9 @@ const Login = () => {
     const response = await axios.post(newURL, data);
 
     if (response.data.success) {
-      setToken(response.data.token);
-      //saving the token in local storage
-      localStorage.setItem("Token", response.data.token);
+      // localStorage.setItem("Token", response.data.token); //saving the token in local storage
+      // setToken(response.data.token);
+      Signin(response.data.token);
     } else {
       alert(response.data.message);
     }
@@ -62,12 +62,11 @@ const Login = () => {
     } else {
       setCurrState("Sign Up");
     }
-    // Handle login logic here
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="signin-popup-container">
+      <form onSubmit={handleLogin} className="signin-popup-container">
         <div className="signin-popup-inputs">
           {currState === "Sign In" ? (
             <></>

@@ -13,40 +13,54 @@ const placeOrder = async (req, res) => {
       deliveryAmount: req.body.deliveryAmount,
       amount: req.body.amount,
       address: req.body.address,
+      customerDetails: req.body.customerDetails,
       payment: true, // Automatically set payment to true
     });
 
-    await newOrder.save();
+    const savedOrder = await newOrder.save(); // Capture the saved order
     await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
 
-    res.json({ success: true, message: "Order placed successfully." });
+    res.status(200).json({
+      success: true,
+      message: "Order placed successfully",
+      orderId: savedOrder._id, // Use the correct variable here
+    });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error while placing the order." });
+    console.error("Error placing order:", error.message, error.stack);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while placing order.",
+    });
   }
 };
 
 const assignOrder = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { userId, orderId } = req.body;
+
+    // Fetch the order
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found." });
+    }
 
     // Fetch all delivery boys
     const deliveryBoys = await deliveryGuyModel.find({
       accountType: "Delivery",
     });
-
-    if (deliveryBoys.length === 0) {
-      return res.json({
-        success: false,
-        message: "No delivery boys available.",
-      });
+    if (!deliveryBoys.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No delivery boys available." });
     }
 
-    // Randomly select a delivery boy
+    // Randomly assign a delivery boy
     const assignedDeliveryBoy =
       deliveryBoys[Math.floor(Math.random() * deliveryBoys.length)];
 
-    // Update the order status and assigned delivery boy details
+    // Update the order with the assigned delivery boy details
     await orderModel.findByIdAndUpdate(orderId, {
       status: "Assigned",
       deliveryBoy: {
@@ -56,10 +70,12 @@ const assignOrder = async (req, res) => {
       },
     });
 
-    // Add the order to the delivery boy's assigned orders
-    await userModel.findByIdAndUpdate(assignedDeliveryBoy._id, {
-      $push: { ordersAssigned: orderId },
-    });
+    // Update the delivery boy's assigned orders
+    await deliveryGuyModel.findByIdAndUpdate(
+      assignedDeliveryBoy._id,
+      { $push: { ordersAssigned: orderId } },
+      { new: true } // Ensure the updated document is returned
+    );
 
     res.json({
       success: true,
@@ -67,13 +83,15 @@ const assignOrder = async (req, res) => {
       deliveryBoy: assignedDeliveryBoy,
     });
   } catch (error) {
-    console.error("Error assigning order:", error);
-    res.json({ success: false, message: "Error assigning order." });
+    console.error("Error in assignOrder:", error.message, error.stack);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while assigning order.",
+    });
   }
 };
 
 //users order for frontend
-
 const userOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({ userId: req.body.userId });
@@ -99,7 +117,7 @@ const listOrders = async (req, res) => {
 const updateStatus = async (req, res) => {
   try {
     await orderModel.findByIdAndUpdate(req.body.orderId, {
-      status: req.body.status,
+      orderStatus: req.body.orderStatus,
     });
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {

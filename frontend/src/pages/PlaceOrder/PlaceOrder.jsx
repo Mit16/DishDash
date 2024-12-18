@@ -5,73 +5,156 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
-  const {
-    getTotalCartAmount,
-    setCartItems,
-    token,
-    food_list,
-    cartItems,
-    URL,
-    assignOrder,
-  } = useContext(StoreContext);
+  const [userDetails, setUserDetails] = useState({});
 
-  const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+  const { getTotalCartAmount, token, food_list, cartItems, URL, setCartItems } =
+    useContext(StoreContext);
+
+  const [addressData, setAddressData] = useState({
     street: "",
     city: "",
+    district: "",
     state: "",
     zipcode: "",
-    country: "",
-    phone: "",
+  });
+
+  const [customerDetails, setCustomerDetails] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone1: "",
+    phone2: "",
   });
 
   const [showPopup, setShowPopup] = useState(false);
 
+  // Fetch user details
+  const fetchUserDetails = async () => {
+    const token = localStorage.getItem("Token");
+    try {
+      const response = await fetch(URL + "/api/user/details", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setUserDetails(data.data);
+      } else {
+        console.error(data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  // Autofill form with stored address
+  const autofillAddress = () => {
+    if (userDetails.address) {
+      setAddressData({
+        street: userDetails.address.street || "",
+        city: userDetails.address.city || "",
+        district: userDetails.address.district || "",
+        state: userDetails.address.state || "",
+        zipcode: userDetails.address.zipcode || "",
+      });
+      setCustomerDetails({
+        firstname: userDetails.fullname?.firstname || "",
+        lastname: userDetails.fullname?.lastname || "",
+        email: userDetails.email || "",
+        phone1: userDetails.phone?.phone1 || "",
+        phone2: userDetails.phone?.phone2 || "",
+      });
+    }
+  };
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setData((data) => ({ ...data, [name]: value }));
+    setAddressData((data) => ({ ...data, [name]: value }));
+  };
+
+  const onCustomerChangeHandler = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setCustomerDetails((data) => ({ ...data, [name]: value }));
   };
 
   const placeOrder = async (event) => {
     event.preventDefault();
-    let orderItems = [];
-    food_list.map((item) => {
-      if (cartItems[item._id] > 0) {
-        let itemInfo = item;
-        itemInfo["quantity"] = cartItems[item._id];
-        orderItems.push(itemInfo);
-      }
-    });
-    let orderData = {
-      address: data,
-      items: orderItems,
-      deliveryAmount: Math.max(getTotalCartAmount() / 10, 40),
-      amount: getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40),
-    };
-    let response = await axios.post(URL + "/api/order/place", orderData, {
-      headers: { token },
-    });
-    if (response.data.success) {
-      setShowPopup(true);
-      setCartItems({});
 
-      // Assign order to a delivery boy
-      const orderId = response.data.orderId; // Ensure the backend returns the orderId
-      await assignOrder(orderId);
-    } else {
-      alert("Error placing order");
+    try {
+      let orderItems = [];
+      food_list.forEach((item) => {
+        if (cartItems[item._id] > 0) {
+          orderItems.push({ ...item, quantity: cartItems[item._id] });
+        }
+      });
+
+      const orderData = {
+        address: addressData,
+        items: orderItems,
+        deliveryAmount: Math.max(getTotalCartAmount() / 10, 40),
+        amount: getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40),
+        customerDetails: {
+          name: `${customerDetails.firstname} ${customerDetails.lastname}`,
+          phone1: customerDetails.phone1,
+          phone2: customerDetails.phone2,
+        },
+      };
+
+      // Place the order
+      const response = await axios.post(`${URL}/api/order/place`, orderData, {
+        headers: { token },
+      });
+
+      if (response.data.success) {
+        setShowPopup(true); // Show popup when order is placed successfully
+        setCartItems({});
+
+        // Assign order to a delivery boy
+        const orderId = response.data.orderId;
+
+        if (!orderId) {
+          console.error("Order ID is missing in the response.");
+          alert("Failed to place the order. Please try again.");
+          return;
+        }
+
+        console.log("Order placed successfully. Order ID:", orderId);
+
+        // Assign the order to a delivery boy
+        const assignResponse = await axios.post(
+          `${URL}/api/order/assignOrder`,
+          { orderId },
+          { headers: { token } }
+        );
+
+        if (assignResponse.data.success) {
+          alert(
+            `Order assigned to: ${assignResponse.data.deliveryBoy.fullname.firstname} ${assignResponse.data.deliveryBoy.fullname.lastname}`
+          );
+        } else {
+          console.error("Assign order failed:", assignResponse.data.message);
+          alert("Failed to assign delivery boy. Please try again.");
+        }
+      } else {
+        console.error("Place order failed:", response.data.message);
+        alert("Error placing order. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error placing or assigning order:", error);
+      alert("An unexpected error occurred.");
     }
   };
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
-      navigate("/cart");
-    } else if (getTotalCartAmount() === 0) {
+    fetchUserDetails();
+    if (!token || getTotalCartAmount() === 0) {
       navigate("/cart");
     }
   }, []);
@@ -92,21 +175,24 @@ const PlaceOrder = () => {
       <form onSubmit={placeOrder} className="place-order">
         <div className="place-order-left">
           <p className="title">Delivery Information</p>
+          <button type="button" onClick={autofillAddress}>
+            Use Stored Address
+          </button>
           <div className="multi-fields">
             <input
               required
               type="text"
-              name="firstName"
-              onChange={onChangeHandler}
-              value={data.firstName}
+              name="firstname"
+              onChange={onCustomerChangeHandler}
+              value={customerDetails.firstname}
               placeholder="First Name"
             />
             <input
               required
               type="text"
-              name="lastName"
-              onChange={onChangeHandler}
-              value={data.lastName}
+              name="lastname"
+              onChange={onCustomerChangeHandler}
+              value={customerDetails.lastname}
               placeholder="Last Name"
             />
           </div>
@@ -114,8 +200,8 @@ const PlaceOrder = () => {
             required
             type="email"
             name="email"
-            onChange={onChangeHandler}
-            value={data.email}
+            onChange={onCustomerChangeHandler}
+            value={customerDetails.email}
             placeholder="Email Id"
           />
           <input
@@ -123,7 +209,7 @@ const PlaceOrder = () => {
             type="text"
             name="street"
             onChange={onChangeHandler}
-            value={data.street}
+            value={addressData.street}
             placeholder="Street"
           />
           <div className="multi-fields">
@@ -132,7 +218,7 @@ const PlaceOrder = () => {
               type="text"
               name="city"
               onChange={onChangeHandler}
-              value={data.city}
+              value={addressData.city}
               placeholder="City"
             />
             <input
@@ -140,7 +226,7 @@ const PlaceOrder = () => {
               type="text"
               name="state"
               onChange={onChangeHandler}
-              value={data.state}
+              value={addressData.state}
               placeholder="State"
             />
           </div>
@@ -150,25 +236,34 @@ const PlaceOrder = () => {
               type="text"
               name="zipcode"
               onChange={onChangeHandler}
-              value={data.zipcode}
+              value={addressData.zipcode}
               placeholder="Zip-Code"
             />
-            <input
+            {/* <input
               required
+              defaultValue="India"
               type="text"
               name="country"
               onChange={onChangeHandler}
               value={data.country}
               placeholder="Country"
-            />
+            /> */}
           </div>
           <input
             required
             type="text"
-            name="phone"
-            onChange={onChangeHandler}
-            value={data.phone}
-            placeholder="Phone"
+            name="phone1"
+            onChange={onCustomerChangeHandler}
+            value={customerDetails.phone1}
+            placeholder="Phone Number"
+          />
+          <input
+            required
+            type="text"
+            name="phone2"
+            onChange={onCustomerChangeHandler}
+            value={customerDetails.phone2}
+            placeholder="Other Phone Number"
           />
         </div>
         <div className="place-order-right">

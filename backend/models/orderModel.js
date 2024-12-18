@@ -6,17 +6,20 @@ const orderSchema = new mongoose.Schema(
     items: { type: Array, required: true },
     amount: { type: Number, required: true },
     deliveryAmount: { type: Number, required: true },
+    customerDetails: {
+      name: { type: String, required: true },
+      phone1: { type: String, required: true },
+      phone2: { type: String, required: true },
+    },
     address: { type: Object, required: true },
-    status: { type: String, default: "Food Processing" },
-    date: { type: Date, default: Date.now() },
+    orderStatus: { type: String, default: "Food Processing" },
     payment: { type: Boolean, default: false },
     deliveryBoy: {
-      name: { type: String },
-      phone: { type: String },
-      id: { type: mongoose.Schema.Types.ObjectId, ref: "deliveryGuy" },
+      type: Object,
+      default: {},
     },
   },
-  { minimize: false }
+  { minimize: false, timestamps: true }
 );
 
 const orderModel =

@@ -5,7 +5,7 @@ import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../assets/assets";
 
 const MyOrders = () => {
-  const { URL, token, deliveryGuy } = useContext(StoreContext);
+  const { URL, token } = useContext(StoreContext);
   const [data, setData] = useState([]);
 
   const fetchOrders = async () => {
@@ -42,7 +42,7 @@ const MyOrders = () => {
             <p>{order.amount}.00</p>
             <p>Items: {order.items.length}</p>
             <p>
-              <span>&#x25cf;</span> <b>{order.status}</b>
+              <span>&#x25cf;</span> <b>{order.orderStatus}</b>
             </p>
             {order.deliveryBoy ? (
               <>

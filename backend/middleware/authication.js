@@ -1,25 +1,34 @@
 import jwt from "jsonwebtoken";
+import extractToken from "../utils/tokenHandler.js";
 
-const authMiddleware = async (req, res, next) => {
-  try {
-    // Look for the token in both 'Token' and 'Authorization' headers
-    const token =
-      req.headers.token ||
-      req.headers.Token ||
-      (req.headers.authorization && req.headers.authorization.split(" ")[1]);
+export const authMiddleware = (roles = []) => {
+  return (req, res, next) => {
+    const token = extractToken(req.headers);
 
     if (!token) {
-      return res.status(401).json({ success: false, message: "Not Authorized, Login Again" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: No token provided" });
     }
 
-    // Verify the token
-    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.userId = token_decode.id;
-    next();
-  } catch (error) {
-    console.error("Authorization Error:", error.message);
-    res.status(401).json({ success: false, message: "Invalid Token" });
-  }
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+
+      // Check role-based access
+      if (roles.length && !roles.includes(decoded.role)) {
+        return res
+          .status(403)
+          .json({ success: false, message: "Forbidden: Access denied" });
+      }
+
+      next();
+    } catch (err) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized: Invalid token" });
+    }
+  };
 };
 
 export default authMiddleware;

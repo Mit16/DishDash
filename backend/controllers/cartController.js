@@ -86,7 +86,7 @@ const removeFromCart = async (req, res) => {
 const getCart = async (req, res) => {
   try {
     const { userId } = req.body;
-
+    console.log("Received userId:", userId); // Debugging
     // Validate input
     if (!userId) {
       return res.status(400).json({ success: false, message: "Invalid input" });
@@ -102,7 +102,7 @@ const getCart = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    let cartData = userData.cartData || {}; // Ensure cartData is an object
+    let cartData = await userData.cartData || {}; // Ensure cartData is an object
 
     res.json({ success: true, cartData });
   } catch (error) {

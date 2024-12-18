@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
     accountType: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    phone: {
+      phone1: { type: String, minlength: 10, maxlength: 15 }, // Phone added
+      phone2: { type: String, minlength: 10, maxlength: 15 }, // Phone added
+    },
+    address: { type: Object, default: {} },
     cartData: { type: Object, default: {} },
   },
   { minimize: false }

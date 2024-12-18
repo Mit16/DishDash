@@ -37,13 +37,13 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
         >
           Menu
         </a>
-        <Link
+        <NavLink
           to="/feedback"
           onClick={() => setShowFeedback(true)}
           className={menu === "Feedback" ? "active" : ""}
         >
           Feedback
-        </Link>
+        </NavLink>
         <a
           href="#about"
           onClick={() => setMenu("About")}
@@ -58,6 +58,16 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
         >
           Contact
         </a>
+        <NavLink
+          to="/profile"
+          onClick={() => {
+            setMenu("Profile");
+            navigate("/profile");
+          }}
+          className={menu === "Profile" ? "active" : ""}
+        >
+          Profile
+        </NavLink>
       </ul>
       <div className="navbar-right flex items-center gap-3 py-1">
         <img src={assets.search_icon} alt="" />

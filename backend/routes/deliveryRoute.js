@@ -13,20 +13,44 @@ const deliveryRouter = express.Router();
 
 deliveryRouter.post("/register", registerUser);
 deliveryRouter.post("/login", loginUser);
-deliveryRouter.get("/earnings", authMiddleware, fetchEarning);
-deliveryRouter.get("/list", authMiddleware, fetchallDeliveryUser);
-deliveryRouter.post("/getAssignedOrders", authMiddleware, getAssignedOrders);
-deliveryRouter.post("/updateDetails", authMiddleware, updateDeliveryDetails);
+deliveryRouter.get(
+  "/earnings",
+  authMiddleware(["deliveryAgent"]),
+  fetchEarning
+);
+deliveryRouter.get("/list", authMiddleware(["customer"]), fetchallDeliveryUser);
+deliveryRouter.get(
+  "/getAssignedOrders",
+  authMiddleware(["deliveryAgent"]),
+  getAssignedOrders
+);
+deliveryRouter.post(
+  "/updateDetails",
+  authMiddleware(["deliveryAgent"]),
+  updateDeliveryDetails
+);
 
 // Dummy handlers for testing
-deliveryRouter.get("/dashboard/:userId", authMiddleware, (req, res) => {
-  res.send(`Dashboard for userId: ${req.params.userId}`);
-});
+deliveryRouter.get(
+  "/dashboard/details",
+  authMiddleware(["deliveryAgent"]),
+  (req, res) => {
+    res.send(`Dashboard for userId: ${req.params.userId}`);
+  }
+);
 
-deliveryRouter.post("/dashboard/:userId/update", authMiddleware, (req, res) => {
-  res.send(`Update dashboard for userId: ${req.params.userId}`);
-});
+deliveryRouter.post(
+  "/dashboard/dashboard",
+  authMiddleware(["deliveryAgent"]),
+  (req, res) => {
+    res.send(`Update dashboard for userId: ${req.params.userId}`);
+  }
+);
 
-deliveryRouter.get("/orders/delivered/:userId", authMiddleware, deliveredById);
+deliveryRouter.get(
+  "/orders/delivered/:userId",
+  authMiddleware(["deliveryAgent"]),
+  deliveredById
+);
 
 export default deliveryRouter;

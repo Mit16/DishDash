@@ -8,6 +8,7 @@ import { useState } from "react";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
 import FeedbackPopup from "./components/FeedbackPopup/FeedbackPopup";
 import MyOrders from "./pages/MyOrders/MyOrders";
+import Profile from "./pages/Profile/Profile";
 
 const App = () => {
   const [showSignin, setShowSignin] = useState(false);
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/order" element={<PlaceOrder />} />
           <Route path="/myorders" element={<MyOrders />} />
+          <Route path="/profile" element={<Profile />} />
           {/* <Route path="/feedback" element={<FeedbackPopup />} /> */}
         </Routes>
       </div>

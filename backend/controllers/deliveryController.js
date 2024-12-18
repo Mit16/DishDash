@@ -61,21 +61,35 @@ const fetchallDeliveryUser = async (req, res) => {
 
 const getAssignedOrders = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user._id; // Get userId from authMiddleware
 
-    // Find the delivery boy and populate the assigned orders
-    const deliveryBoy = await userModel
-      .findById(userId)
-      .populate("ordersAssigned");
-
-    if (!deliveryBoy || deliveryBoy.accountType !== "Delivery") {
-      return res.json({ success: false, message: "Delivery boy not found." });
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized access" });
     }
 
-    res.json({ success: true, data: deliveryBoy.ordersAssigned });
+    // Find the delivery guy and populate assigned orders
+    const deliveryBoy = await DeliveryGuy.findById(userId).populate({
+      path: "ordersAssigned",
+      select: "items customerDetails address orderStatus createdAt", // Fetch required fields
+    });
+
+    if (!deliveryBoy || deliveryBoy.accountType !== "Delivery") {
+      return res.status(404).json({
+        success: false,
+        message: "Delivery boy not found or invalid account type.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: deliveryBoy.ordersAssigned,
+    });
   } catch (error) {
     console.error("Error fetching assigned orders:", error);
-    res.json({ success: false, message: "Error fetching assigned orders." });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching assigned orders.",
+    });
   }
 };
 
@@ -95,10 +109,11 @@ const deliveredById = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const orders = await Order.find({
+    const orders = await orderModel.find({
       orderStatus: "Delivered",
       userId: userId,
     });
+    
     res.status(200).json({ success: true, orders });
   } catch (err) {
     res.status(500).json({ success: false, error: "Failed to fetch orders" });
