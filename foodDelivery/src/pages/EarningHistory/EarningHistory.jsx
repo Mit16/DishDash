@@ -4,51 +4,63 @@ import parcel_icon from "../../assets/parcel_icon.png";
 import { DeliveryContext } from "../../context/Delivery.context";
 
 const EarningHistory = () => {
-  const { orders, totalEarnings } = useContext(DeliveryContext);
+  const { deliveredOrders, totalEarnings } = useContext(DeliveryContext);
+
+  // Sort orders by most recent (assuming orders have a `createdAt` or similar timestamp)
+  const sortedOrders = [...deliveredOrders].sort((a, b) => {
+    const dateA = new Date(a.createdAt); // Replace with your date field
+    const dateB = new Date(b.createdAt);
+    return dateB - dateA;
+  });
 
   return (
-    <div className="order add">
+    <div className="order-earning">
       <h3>Earning History</h3>
-      <p>Total Lifetime Earnings: ₹{totalEarnings}</p>
-      {/* Optionally, you can fetch and display detailed historical records */}
-      <div className="order-list">
-        {orders.map((order, index) => (
-          <div key={index} className="order-item">
-            <img src={parcel_icon} alt="" />
-            <div>
-              <p className="order-item-food">
-                {order.items.map((item, index) => {
-                  if (index === order.items.length - 1) {
-                    return item.name + " x " + item.quantity;
-                  } else {
-                    return item.name + " x " + item.quantity + ", ";
-                  }
-                })}
+      <p>Total Earnings: ₹ {totalEarnings}</p>
+      {sortedOrders.length === 0 ? (
+        <p>No orders in history.</p>
+      ) : (
+        <ul>
+          {sortedOrders.map((order) => (
+            <li key={order._id} className="order-item">
+              <h4>Order ID: {order._id}</h4>
+              <p>
+                <strong>Status:</strong> {order.orderStatus}
               </p>
-              <p className="order-item-name">
-                {order.address.firstName + " " + order.address.lastName}
+              <p>
+                <strong>Customer:</strong> {order.customerDetails.name}
               </p>
-              <div className="order-item-address">
-                <p>{order.address.street + ","}</p>
-                <p>
-                  {order.address.city +
-                    ", " +
-                    order.address.state +
-                    ", " +
-                    order.address.country +
-                    ", " +
-                    order.address.zipcode}
-                </p>
-              </div>
-              <p className="order-item-phone">{order.address.phone}</p>
-            </div>
-            <p>Items : {order.items.length}</p>
-            <p>₹ {order.amount}</p>
-            <p>₹ {order.deliveryAmount}</p>
-            <p>{order.status}</p>
-          </div>
-        ))}
-      </div>
+              <p>
+                <strong>Contact:</strong> {order.customerDetails.phone1},{" "}
+                {order.customerDetails.phone2}
+              </p>
+              <p>
+                <strong>Items:</strong>{" "}
+                {order.items.map((item) => (
+                  <span key={item._id}>
+                    {item.name} (x{item.quantity}) - ₹{item.price} <br />
+                  </span>
+                ))}
+              </p>
+              <p>
+                <strong>Total Amount:</strong> ₹
+                {order.items.reduce(
+                  (total, item) => total + item.price * item.quantity,
+                  0
+                )}
+              </p>
+              <p>
+                <strong>Delivery Amount:</strong> ₹{order.deliveryAmount || 0}
+              </p>
+              <p>
+                <strong>Order Date:</strong>{" "}
+                {new Date(order.createdAt).toLocaleString()}{" "}
+                {/* Replace with actual date field */}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

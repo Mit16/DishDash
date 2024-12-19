@@ -3,10 +3,11 @@ import userModel from "../models/userModel.js";
 // Add item to user cart
 const addToCart = async (req, res) => {
   try {
-    const { userId, itemId } = req.body;
+    const userId = req.user._id; // Extract userId from middleware
+    const { itemId } = req.body;
 
     // Validate input
-    if (!userId || !itemId) {
+    if (!itemId) {
       return res.status(400).json({ success: false, message: "Invalid input" });
     }
 
@@ -41,10 +42,11 @@ const addToCart = async (req, res) => {
 // Remove items from user cart
 const removeFromCart = async (req, res) => {
   try {
-    const { userId, itemId } = req.body;
+    const userId = req.user._id; // Extract userId from middleware
+    const { itemId } = req.body;
 
     // Validate input
-    if (!userId || !itemId) {
+    if (!itemId) {
       return res.status(400).json({ success: false, message: "Invalid input" });
     }
 
@@ -85,12 +87,7 @@ const removeFromCart = async (req, res) => {
 // Fetch user cart data
 const getCart = async (req, res) => {
   try {
-    const { userId } = req.body;
-    console.log("Received userId:", userId); // Debugging
-    // Validate input
-    if (!userId) {
-      return res.status(400).json({ success: false, message: "Invalid input" });
-    }
+    const userId = req.user._id; // Extract userId from middleware
 
     // Find user
     let userData = await userModel.findById(userId);
@@ -102,7 +99,7 @@ const getCart = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    let cartData = await userData.cartData || {}; // Ensure cartData is an object
+    let cartData = (await userData.cartData) || {}; // Ensure cartData is an object
 
     res.json({ success: true, cartData });
   } catch (error) {

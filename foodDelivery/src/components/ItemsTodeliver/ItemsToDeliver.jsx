@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import "./ItemsToDeliver.css";
 import parcel_icon from "../../assets/parcel_icon.png";
 import { useNavigate } from "react-router-dom";
@@ -6,12 +6,42 @@ import { DeliveryContext } from "../../context/Delivery.context";
 
 const ItemsToDeliver = () => {
   const navigate = useNavigate();
-  const { assignedOrders } = useContext(DeliveryContext);
+  const { assignedOrders, updateOrderStatus } = useContext(DeliveryContext);
 
-  // Filter orders with status not equal to "Delivered" and get top 5
+  const [selectedStatus, setSelectedStatus] = useState({}); // Track selected statuses
+
+  // Filter and sort orders by date (recent first)
   const filteredOrders = assignedOrders
     .filter((order) => order.orderStatus !== "Delivered")
-    .slice(0, 5);
+    .filter((order) => order.orderStatus !== "Cancelled")
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const handleStatusChange = (orderId, status) => {
+    setSelectedStatus((prev) => ({
+      ...prev,
+      [orderId]: status,
+    }));
+  };
+
+  const handleStatusUpdate = async (orderId) => {
+    try {
+      const orderStatus = selectedStatus[orderId] || "";
+      if (!orderStatus) {
+        alert("Please select a status before updating.");
+        return;
+      }
+
+      const response = await updateOrderStatus(orderId, orderStatus);
+
+      if (response.success) {
+        alert("Order status updated successfully");
+      } else {
+        alert("Failed to update order status: " + response.message);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <div className="order-list">
@@ -61,9 +91,34 @@ const ItemsToDeliver = () => {
               </p>
               <p>
                 <strong>Order Date:</strong>{" "}
-                {new Date(order.createdAt).toLocaleString()}{" "}
-                {/* Replace with actual date field */}
+                {new Date(order.createdAt).toLocaleString()}
               </p>
+              <div className="status-update">
+                {order.orderStatus === "Cancelled" ? (
+                  <p style={{ color: "green" }}>
+                    <strong>Order Cancelled: Status cannot be modified.</strong>
+                  </p>
+                ) : (
+                  <>
+                    <select
+                      onChange={(event) =>
+                        handleStatusChange(order._id, event.target.value)
+                      }
+                      value={selectedStatus[order._id] || order.orderStatus}
+                    >
+                      <option value="Assigned to Delivery Agent">
+                        Assigned to Delivery Agent
+                      </option>
+                      <option value="Picked Up">Picked Up</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                    </select>
+                    <button onClick={() => handleStatusUpdate(order._id)}>
+                      Update Status
+                    </button>
+                  </>
+                )}
+              </div>
             </li>
           ))}
         </ul>

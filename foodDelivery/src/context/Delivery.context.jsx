@@ -1,8 +1,8 @@
 import { createContext, useState } from "react";
 import { useEffect } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "./axiosConfig";
 
 export const DeliveryContext = createContext(null);
 
@@ -10,25 +10,55 @@ const DeliveryContextProvider = ({ children }) => {
   // Shared state for delivery data
   const [token, setToken] = useState(localStorage.getItem("Token") || null);
   const [assignedOrders, setAssignedOrders] = useState([]);
-  const [deliveredOrder, setDeliveredOrder] = useState([]);
-
   const [totalEarnings, setTotalEarnings] = useState(0);
   const navigate = useNavigate();
+  const [deliveredOrders, setDeliveredOrders] = useState([]); // Store delivered orders
   const apiURL = "http://localhost:4000";
 
-  const [orders, setOrders] = useState([]);
-
+  // Fetch earnings
   const fetchEarnings = async () => {
     try {
-      const response = await axios.get("/api/earnings");
-      if (response.data.success) {
-        setTotalEarnings(response.data.totalEarnings);
+      // Fetch delivered orders
+      const deliveredResponse = await axiosInstance.get(
+        "/api/delivery/orders/delivered"
+      );
+
+      if (deliveredResponse.data.success) {
+        const orders = deliveredResponse.data.orders;
+        setDeliveredOrders(orders); // Store delivered orders locally
+
+        // Calculate total earnings
+        const earnings = orders.reduce(
+          (sum, order) => sum + order.deliveryAmount,
+          0
+        );
+
+        // Update totalEarnings in the database
+        const earningsResponse = await axiosInstance.post(
+          "/api/delivery/updateDetails",
+          { updateData: { totalEarnings: earnings } }
+        );
+
+        if (earningsResponse.data.success) {
+          setTotalEarnings(earnings); // Update local state
+          toast.success("Earnings updated successfully.");
+        } else {
+          toast.error(
+            earningsResponse.data.message || "Failed to update earnings."
+          );
+        }
+      } else {
+        toast.error(
+          deliveredResponse.data.message || "Failed to fetch delivered orders."
+        );
       }
     } catch (error) {
-      console.error("Error fetching earnings:", error);
+      console.error("Error in fetchEarnings:", error);
+      toast.error("An error occurred while fetching earnings.");
     }
   };
 
+  // Fetch assigned orders
   const fetchAssignedOrders = async () => {
     // const token = localStorage.getItem("Token"); // Retrieve token directly
     if (!token) {
@@ -36,15 +66,9 @@ const DeliveryContextProvider = ({ children }) => {
       return;
     }
     try {
-      const response = await axios.get(
-        `${apiURL}/api/delivery/getAssignedOrders`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await axiosInstance.get(
+        "/api/delivery/getAssignedOrders"
       );
-      console.log("Response:", response.data);
 
       if (response.data.success) {
         setAssignedOrders(response.data.data);
@@ -66,6 +90,21 @@ const DeliveryContextProvider = ({ children }) => {
     }
   };
 
+  const updateOrderStatus = async (orderId, orderStatus) => {
+    try {
+      const response = await axiosInstance.post("/api/delivery/status", {
+        orderId,
+        orderStatus,
+      });
+
+      return response.data; // Return the response data for success/failure handling
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      throw new Error("An error occurred while updating order status.");
+    }
+  };
+
+  // Signout function
   const Signout = () => {
     localStorage.removeItem("Token");
     setToken("");
@@ -84,9 +123,9 @@ const DeliveryContextProvider = ({ children }) => {
       const storedToken = localStorage.getItem("Token");
       if (storedToken) {
         setToken(storedToken);
-        await fetchEarnings();
         if (token) {
           await fetchAssignedOrders();
+          await fetchEarnings();
         }
       } else {
         console.error("No token found in localStorage!");
@@ -95,18 +134,16 @@ const DeliveryContextProvider = ({ children }) => {
     loadData();
   }, []);
 
-
   const DeliveryContextValue = {
     assignedOrders,
-    orders,
-    setOrders,
     token,
     setToken,
     apiURL,
-    deliveredOrder,
     Signout,
     Signin,
     totalEarnings,
+    updateOrderStatus,
+    deliveredOrders,
   };
 
   return (

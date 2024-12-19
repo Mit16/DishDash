@@ -83,3 +83,84 @@ const Orders = ({ apiURL }) => {
 };
 
 export default Orders;
+
+
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+
+// const OrdersList = () => {
+//   const [orders, setOrders] = useState([]);
+
+//   const fetchAllOrders = async () => {
+//     try {
+//       const response = await axios.get(apiURL + "/api/orders");
+//       setOrders(response.data.orders);
+//     } catch (error) {
+//       console.error("Error fetching orders:", error);
+//     }
+//   };
+
+//   const orderStatusHandler = async (event, orderId) => {
+//     try {
+//       const response = await axios.post(apiURL + "/api/orders/status", {
+//         orderId,
+//         orderStatus: event.target.value,
+//       });
+
+//       if (response.data.success) {
+//         alert("Order status updated successfully");
+//         await fetchAllOrders();
+//       } else {
+//         alert("Failed to update order status: " + response.data.message);
+//       }
+//     } catch (error) {
+//       console.error("Error updating order status:", error);
+//       alert("An error occurred while updating order status.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchAllOrders();
+//   }, []);
+
+//   return (
+//     <div>
+//       <h1>Orders List</h1>
+//       <table>
+//         <thead>
+//           <tr>
+//             <th>Order ID</th>
+//             <th>Status</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {orders.map((order) => (
+//             <tr key={order._id}>
+//               <td>{order._id}</td>
+//               <td>
+//                 <select
+//                   onChange={(event) => orderStatusHandler(event, order._id)}
+//                   value={order.orderStatus}
+//                 >
+//                   {/* Adjust options based on portal type */}
+//                   <option value="Ordered">Ordered</option>
+//                   <option value="Confirmed">Confirmed</option>
+//                   <option value="In Preparation">In Preparation</option>
+//                   <option value="Ready for Pickup">Ready for Pickup</option>
+//                   <option value="Assigned to Delivery Agent">Assigned to Delivery Agent</option>
+//                   <option value="Picked Up">Picked Up</option>
+//                   <option value="Out for Delivery">Out for Delivery</option>
+//                   <option value="Delivered">Delivered</option>
+//                   <option value="Cancelled">Cancelled</option>
+//                   <option value="Delayed">Delayed</option>
+//                 </select>
+//               </td>
+//             </tr>
+//           ))}
+//         </tbody>
+//       </table>
+//     </div>
+//   );
+// };
+
+// export default OrdersList;

@@ -119,9 +119,11 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Update user details
 const updateUserDetails = async (req, res) => {
   try {
-    const { userId, address, phone } = req.body;
+    const { address, phone } = req.body;
+    const userId = req.user._id; // Extracted from authMiddleware
 
     if (!userId) {
       return res
@@ -129,7 +131,7 @@ const updateUserDetails = async (req, res) => {
         .json({ success: false, message: "User ID is required" });
     }
 
-    // Find the user by ID and update fields
+    // Update user details
     const updatedUser = await userModel.findByIdAndUpdate(
       userId,
       {
@@ -141,7 +143,7 @@ const updateUserDetails = async (req, res) => {
           address,
         },
       },
-      { new: true, runValidators: true } // Return updated document and run schema validators
+      { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
@@ -164,29 +166,30 @@ const updateUserDetails = async (req, res) => {
 // Fetch user details
 const getUserDetails = async (req, res) => {
   try {
-    const userId = req.user._id; // Extracted from JWT token
+    const userId = req.user._id;
 
     const user = await userModel
       .findById(userId)
       .select("fullname email phone address");
-
     if (!user) {
+      console.log("User not found");
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
     }
 
+    // console.log("User details:", user);
     res.json({ success: true, data: user });
   } catch (error) {
-    console.error("Error fetching user details:", error);
+    console.error("Error in getUserDetails:", error);
     res.status(500).json({ success: false, message: "Server error occurred" });
   }
 };
 
 // Helper function to determine the model based on accountType
 const getModel = (accountType) => {
-  if (accountType === "Consumer") return userModel;
-  if (accountType === "Delivery") return deliveryGuyModel;
+  if (accountType === "Customer") return userModel;
+  if (accountType === "DeliveryAgent") return deliveryGuyModel;
   return null;
 };
 

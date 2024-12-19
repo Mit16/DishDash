@@ -1,14 +1,18 @@
 import "./PlaceOrder.css";
 import { StoreContext } from "../../context/StoreContext";
 import { useState, useContext, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../context/axiosConfig";
 
 const PlaceOrder = () => {
-  const [userDetails, setUserDetails] = useState({});
-
-  const { getTotalCartAmount, token, food_list, cartItems, URL, setCartItems } =
-    useContext(StoreContext);
+  const {
+    getTotalCartAmount,
+    userDetails,
+    token,
+    food_list,
+    cartItems,
+    setCartItems,
+  } = useContext(StoreContext);
 
   const [addressData, setAddressData] = useState({
     street: "",
@@ -27,28 +31,6 @@ const PlaceOrder = () => {
   });
 
   const [showPopup, setShowPopup] = useState(false);
-
-  // Fetch user details
-  const fetchUserDetails = async () => {
-    const token = localStorage.getItem("Token");
-    try {
-      const response = await fetch(URL + "/api/user/details", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setUserDetails(data.data);
-      } else {
-        console.error(data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
 
   // Autofill form with stored address
   const autofillAddress = () => {
@@ -86,13 +68,15 @@ const PlaceOrder = () => {
     event.preventDefault();
 
     try {
-      let orderItems = [];
-      food_list.forEach((item) => {
-        if (cartItems[item._id] > 0) {
-          orderItems.push({ ...item, quantity: cartItems[item._id] });
-        }
-      });
+      // Prepare order items
+      const orderItems = food_list
+        .filter((item) => cartItems[item._id] > 0)
+        .map((item) => ({
+          ...item,
+          quantity: cartItems[item._id],
+        }));
 
+      // Prepare order data
       const orderData = {
         address: addressData,
         items: orderItems,
@@ -106,15 +90,12 @@ const PlaceOrder = () => {
       };
 
       // Place the order
-      const response = await axios.post(`${URL}/api/order/place`, orderData, {
-        headers: { token },
-      });
+      const response = await axiosInstance.post("/api/order/place", orderData);
 
       if (response.data.success) {
-        setShowPopup(true); // Show popup when order is placed successfully
-        setCartItems({});
+        setShowPopup(true); // Show popup on successful order placement
+        setCartItems({}); // Clear the cart
 
-        // Assign order to a delivery boy
         const orderId = response.data.orderId;
 
         if (!orderId) {
@@ -126,10 +107,9 @@ const PlaceOrder = () => {
         console.log("Order placed successfully. Order ID:", orderId);
 
         // Assign the order to a delivery boy
-        const assignResponse = await axios.post(
-          `${URL}/api/order/assignOrder`,
-          { orderId },
-          { headers: { token } }
+        const assignResponse = await axiosInstance.post(
+          "/api/order/assignOrder",
+          { orderId }
         );
 
         if (assignResponse.data.success) {
@@ -153,7 +133,6 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchUserDetails();
     if (!token || getTotalCartAmount() === 0) {
       navigate("/cart");
     }

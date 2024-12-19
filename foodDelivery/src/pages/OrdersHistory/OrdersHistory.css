@@ -1,20 +1,20 @@
-.order-history {
+.order-list {
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: #f9f9f9;
   border-radius: 8px;
 }
 
 .order-item {
   padding: 15px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #ffffff;
 }
 
-.order-item h4 {
+.order-item h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   color: #333;
 }
 
@@ -24,16 +24,16 @@
   color: #555;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+button {
+  margin-top: 20px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.order-item span {
-  display: block;
-  margin-left: 10px;
-}
-
-p strong {
-  color: #000;
+button:hover {
+  background-color: #0056b3;
 }

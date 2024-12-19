@@ -18,7 +18,7 @@ const Login = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "deliveryAgent",
+    accountType: "DeliveryAgent",
   });
 
   const onChangeSubmitHandler = (event) => {
@@ -42,9 +42,9 @@ const Login = () => {
     e.preventDefault();
     let newURL = apiURL;
     if (currState === "Sign In") {
-      newURL += "/api/user/login";
+      newURL += "/api/delivery/login";
     } else {
-      newURL += "/api/user/register";
+      newURL += "/api/delivery/register";
     }
 
     const response = await axios.post(newURL, data);

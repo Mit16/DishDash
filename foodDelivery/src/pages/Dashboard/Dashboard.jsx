@@ -1,19 +1,22 @@
 import "./Dashboard.css";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { DeliveryContext } from "../../context/Delivery.context";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { axiosInstance } from "../../context/axiosConfig";
 
 const Dashboard = () => {
   const [deliveryId, SetDeliveryID] = useState("");
+  const [userDetails, setUserDetails] = useState(null);
+  const [isEditable, setIsEditable] = useState(false); // To toggle edit mode
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const navigate = useNavigate();
 
-  const { apiURL } = useContext(DeliveryContext);
+  const { apiURL, token } = useContext(DeliveryContext);
 
-  const [registerData, setRegisterData] = useState({
+  const [updatedDetails, setUpdatedDetails] = useState({
     dateOfBirth: "",
     gender: "",
     phoneNumber: "",
@@ -52,10 +55,35 @@ const Dashboard = () => {
     navigate("/login"); // Navigate to login after closing the popup
   };
 
+  // Fetch user details
+  // useEffect(() => {
+  //   const fetchDetails = async () => {
+  //     try {
+  //       const response = await axiosInstance.get(
+  //         "/api/delivery/dashboard/details"
+  //       );
+
+  //       if (response.data.success) {
+  //         setUserDetails(response.data.data);
+  //         setUpdatedDetails(response.data.data); // Set as initial data for updates
+  //       } else {
+  //         toast.error(response.data.message || "Failed to fetch details.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching details:", error);
+  //       toast.error("An error occurred while fetching details.");
+  //     }
+  //   };
+
+  //   if (token) {
+  //     fetchDetails();
+  //   }
+  // }, [token]);
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setRegisterData((data) => ({ ...data, [name]: value }));
+    setUpdatedDetails((data) => ({ ...data, [name]: value }));
   };
 
   const handleRegisterClick = async (event) => {
@@ -63,26 +91,16 @@ const Dashboard = () => {
     generateDeliveryID();
 
     try {
-      // Add the delivery ID to the data
-      const dataToSend = { ...registerData, deliveryId };
-
       // Send the data to the backend
-      const response = await axios.post(
-        `${apiURL}/api/delivery/updateDetails`,
-        {
-          updateData: dataToSend,
-          userId: localStorage.getItem("userId"), // Assuming userId is stored in localStorage
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("Token")}`, // Add token for authentication
-          },
-        }
-      );
+      const response = await axiosInstance.post("/api/delivery/updateDetails", {
+        updateData: updatedDetails,
+      });
 
       if (response.data.success) {
         toast.success("Details updated successfully!");
-        setIsPopupOpen(true); // Show the success popup
+        setUserDetails(updatedDetails); // Update the local state
+        setIsEditable(false); // Disable edit mode
+        setIsPopupOpen(true); // Show success popup
       } else {
         toast.error(response.data.message || "Failed to update details.");
       }
@@ -95,7 +113,7 @@ const Dashboard = () => {
   return (
     <>
       <form onSubmit={handleRegisterClick}>
-        <div className="Register">
+        <div className="Dashboard">
           {/* <input
           type="text"
           name="deliveryId"
@@ -109,7 +127,7 @@ const Dashboard = () => {
               name="dateOfBirth"
               placeholder="Date of Birth"
               onChange={onChangeHandler}
-              value={registerData.dateOfBirth}
+              value={updatedDetails.dateOfBirth}
               required
               id="dateOfBirth"
             />
@@ -119,7 +137,7 @@ const Dashboard = () => {
                   type="radio"
                   name="gender"
                   value="Male"
-                  checked={registerData.gender === "Male"}
+                  checked={updatedDetails.gender === "Male"}
                   onChange={onChangeHandler}
                 />
                 Male
@@ -129,7 +147,7 @@ const Dashboard = () => {
                   type="radio"
                   name="gender"
                   value="Female"
-                  checked={registerData.gender === "Female"}
+                  checked={updatedDetails.gender === "Female"}
                   onChange={onChangeHandler}
                 />
                 Female
@@ -139,7 +157,7 @@ const Dashboard = () => {
                   type="radio"
                   name="gender"
                   value="Others"
-                  checked={registerData.gender === "Others"}
+                  checked={updatedDetails.gender === "Others"}
                   onChange={onChangeHandler}
                 />
                 Others
@@ -153,7 +171,7 @@ const Dashboard = () => {
               placeholder="Phone Number"
               min={10}
               onChange={onChangeHandler}
-              value={registerData.phoneNumber}
+              value={updatedDetails.phoneNumber}
               required
               id="phoneNumber"
             />
@@ -163,7 +181,7 @@ const Dashboard = () => {
                 name="street"
                 placeholder="Street/Area"
                 onChange={onChangeHandler}
-                value={registerData.street}
+                value={updatedDetails.street}
                 required
                 id="street"
               />
@@ -172,7 +190,7 @@ const Dashboard = () => {
                 name="city"
                 placeholder="City"
                 onChange={onChangeHandler}
-                value={registerData.city}
+                value={updatedDetails.city}
                 required
                 id="city"
               />
@@ -182,7 +200,7 @@ const Dashboard = () => {
               name="state"
               placeholder="State"
               onChange={onChangeHandler}
-              value={registerData.state}
+              value={updatedDetails.state}
               required
               id="state"
             />
@@ -193,7 +211,7 @@ const Dashboard = () => {
               name="district"
               placeholder="District"
               onChange={onChangeHandler}
-              value={registerData.district}
+              value={updatedDetails.district}
               required
               id="district"
             />
@@ -202,7 +220,7 @@ const Dashboard = () => {
               name="zipcode"
               placeholder="Zip Code"
               onChange={onChangeHandler}
-              value={registerData.zipcode}
+              value={updatedDetails.zipcode}
               required
               id="zipcode"
             />
@@ -215,7 +233,7 @@ const Dashboard = () => {
                   name="govId"
                   placeholder="Government Identity"
                   onChange={onChangeHandler}
-                  value={registerData.govId}
+                  value={updatedDetails.govId}
                   id="govId"
                 />
                 <div>
@@ -225,7 +243,7 @@ const Dashboard = () => {
                     name="drivingLicense"
                     placeholder="Driving License Number"
                     onChange={onChangeHandler}
-                    value={registerData.drivingLicense}
+                    value={updatedDetails.drivingLicense}
                     id="deivingLicense"
                   />
                 </div>
@@ -234,7 +252,7 @@ const Dashboard = () => {
                 name="vehicleType"
                 id="vehicle"
                 onChange={onChangeHandler}
-                value={registerData.vehicleType}
+                value={updatedDetails.vehicleType}
               >
                 <option value="">--Select--</option>
                 <option value="Bike">Bike</option>
@@ -250,7 +268,7 @@ const Dashboard = () => {
                 name="vehicleNumber"
                 placeholder="XX-12-XX-1234"
                 onChange={onChangeHandler}
-                value={registerData.vehicleNumber}
+                value={updatedDetails.vehicleNumber}
                 required
                 id="vehicleNumber"
               />
@@ -261,7 +279,7 @@ const Dashboard = () => {
                   type="radio"
                   name="vehicleInsurance"
                   value="Yes"
-                  checked={registerData.vehicleInsurance === "Yes"}
+                  checked={updatedDetails.vehicleInsurance === "Yes"}
                   onChange={onChangeHandler}
                 />
                 Yes
@@ -271,7 +289,7 @@ const Dashboard = () => {
                   type="radio"
                   name="vehicleInsurance"
                   value="No"
-                  checked={registerData.vehicleInsurance === "No"}
+                  checked={updatedDetails.vehicleInsurance === "No"}
                   onChange={onChangeHandler}
                 />
                 No
@@ -284,7 +302,7 @@ const Dashboard = () => {
               name="bankName"
               placeholder="Bank Name"
               onChange={onChangeHandler}
-              value={registerData.bankName}
+              value={updatedDetails.bankName}
               id=""
             />
             <div>
@@ -293,7 +311,7 @@ const Dashboard = () => {
                 name="accountNumber"
                 placeholder="Account Number"
                 onChange={onChangeHandler}
-                value={registerData.accountNumber}
+                value={updatedDetails.accountNumber}
                 id=""
               />
               <input
@@ -301,7 +319,7 @@ const Dashboard = () => {
                 name="accountHolderName"
                 placeholder="Account Holder Name"
                 onChange={onChangeHandler}
-                value={registerData.accountHolderName}
+                value={updatedDetails.accountHolderName}
                 id=""
               />
             </div>
@@ -310,7 +328,7 @@ const Dashboard = () => {
               name="ifscCode"
               placeholder="IFSC Code"
               onChange={onChangeHandler}
-              value={registerData.ifscCode}
+              value={updatedDetails.ifscCode}
               id=""
             />
           </div>
@@ -320,7 +338,7 @@ const Dashboard = () => {
               name="deliveryArea"
               placeholder="Prefered delivery area"
               onChange={onChangeHandler}
-              value={registerData.deliveryArea}
+              value={updatedDetails.deliveryArea}
               id=""
             />
           </div>

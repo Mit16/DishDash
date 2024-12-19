@@ -8,7 +8,7 @@ const placeOrder = async (req, res) => {
 
   try {
     const newOrder = new orderModel({
-      userId: req.body.userId,
+      userId: req.user._id,
       items: req.body.items,
       deliveryAmount: req.body.deliveryAmount,
       amount: req.body.amount,
@@ -18,7 +18,7 @@ const placeOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save(); // Capture the saved order
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+    await userModel.findByIdAndUpdate(req.user._id, { cartData: {} });
 
     res.status(200).json({
       success: true,
@@ -36,7 +36,7 @@ const placeOrder = async (req, res) => {
 
 const assignOrder = async (req, res) => {
   try {
-    const { userId, orderId } = req.body;
+    const { orderId } = req.body;
 
     // Fetch the order
     const order = await orderModel.findById(orderId);
@@ -94,7 +94,8 @@ const assignOrder = async (req, res) => {
 //users order for frontend
 const userOrders = async (req, res) => {
   try {
-    const orders = await orderModel.find({ userId: req.body.userId });
+    const userId = req.user._id; // Extract userId from middleware
+    const orders = await orderModel.find({ userId });
     res.json({ success: true, data: orders });
   } catch (error) {
     console.error("Unable to fetch orders:", error);

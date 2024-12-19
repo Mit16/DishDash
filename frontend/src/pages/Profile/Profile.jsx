@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import "./Profile.css";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { StoreContext } from "../../context/StoreContext";
 
 const Profile = () => {
-  const [userDetails, setUserDetails] = useState({});
-  const { updateProfile, URL } = useContext(StoreContext);
+  const { updateProfile, userDetails } = useContext(StoreContext);
 
   const [addressData, setAddressData] = useState({
     street: "",
@@ -21,27 +20,6 @@ const Profile = () => {
       phone2: "",
     },
   });
-
-  const fetchUserDetails = async () => {
-    const token = localStorage.getItem("Token");
-    try {
-      const response = await fetch(URL + "/api/user/details", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setUserDetails(data.data);
-      } else {
-        console.error(data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -62,10 +40,6 @@ const Profile = () => {
     event.preventDefault();
     updateProfile(phoneNumber, addressData);
   };
-
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
 
   return (
     <div>

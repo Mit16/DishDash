@@ -21,7 +21,7 @@ const OrdersHistory = () => {
         <p>No orders in history.</p>
       ) : (
         <ul>
-          {sortedOrders.map(order => (
+          {sortedOrders.map((order) => (
             <li key={order._id} className="order-item">
               <h4>Order ID: {order._id}</h4>
               <p>
@@ -31,28 +31,43 @@ const OrdersHistory = () => {
                 <strong>Customer:</strong> {order.customerDetails.name}
               </p>
               <p>
-                <strong>Contact:</strong> {order.customerDetails.phone1}, {order.customerDetails.phone2}
+                <strong>Contact:</strong> {order.customerDetails.phone1},{" "}
+                {order.customerDetails.phone2}
               </p>
               <p>
-                <strong>Address:</strong> {`${order.address.street}, ${order.address.city}, ${order.address.state} - ${order.address.zipcode}`}
+                <strong>Address:</strong>{" "}
+                {`${order.address.street}, ${order.address.city}, ${order.address.state} - ${order.address.zipcode}`}
               </p>
               <p>
                 <strong>Items:</strong>{" "}
-                {order.items.map(item => (
+                {order.items.map((item) => (
                   <span key={item._id}>
-                    {item.name} (x{item.quantity}) - ₹{item.price} <br />
+                    {item.name} (x{item.quantity})<br />
                   </span>
                 ))}
               </p>
               <p>
-                <strong>Total Amount:</strong> ₹
-                {order.items.reduce((total, item) => total + item.price * item.quantity, 0)}
+                <strong>Total Amount:</strong> ₹{order.amount || 0}
+                {/* {order.items.reduce(
+                  (total, item) => total + item.price * item.quantity,
+                  0
+                )} */}
               </p>
               <p>
                 <strong>Delivery Amount:</strong> ₹{order.deliveryAmount || 0}
               </p>
               <p>
-                <strong>Order Date:</strong> {new Date(order.createdAt).toLocaleString()} {/* Replace with actual date field */}
+                <strong>Payment:</strong>{" "}
+                {order.payment === true
+                  ? order.orderStatus === "Cancelled"
+                    ? "Cancelled"
+                    : "Done"
+                  : "Cash on Delivery"}
+              </p>
+              <p>
+                <strong>Order Date:</strong>{" "}
+                {new Date(order.createdAt).toLocaleString()}{" "}
+                {/* Replace with actual date field */}
               </p>
             </li>
           ))}

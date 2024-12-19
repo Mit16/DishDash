@@ -16,7 +16,7 @@ const LoginPopup = ({ setShowSignin }) => {
     email: "",
     password: "",
     confirmPassword: "",
-    accountType: "customer",
+    accountType: "Customer",
   });
 
   const onChangeSubmitHandler = (event) => {
@@ -56,6 +56,22 @@ const LoginPopup = ({ setShowSignin }) => {
       alert(response.data.message);
     }
   };
+
+  // const signIn = async (credentials) => {
+  //   try {
+  //     const response = await axiosInstance.post("/api/auth/login", credentials);
+  //     if (response.data.success) {
+  //       const newToken = response.data.token;
+  //       localStorage.setItem("Token", newToken); // Store the token
+  //       setToken(newToken); // Update the token state
+  //     } else {
+  //       alert("Sign-in failed: " + response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error signing in:", error);
+  //     alert("An error occurred during sign-in.");
+  //   }
+  // };
 
   return (
     <div className="signin-popup">

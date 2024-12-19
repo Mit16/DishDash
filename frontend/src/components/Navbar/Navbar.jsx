@@ -7,15 +7,9 @@ import main_logo from "../../assets/main_logo.png";
 
 const Navbar = ({ setShowSignin, setShowFeedback }) => {
   const [menu, setMenu] = useState("Home");
-  const { token, setToken } = useContext(StoreContext);
+  const { token, signOut } = useContext(StoreContext);
   const { getTotalCartAmount } = useContext(StoreContext);
   const navigate = useNavigate();
-
-  const logout = () => {
-    localStorage.removeItem("Token");
-    setToken("");
-    navigate("/");
-  };
 
   return (
     <div className="navbar px-5 py-0 flex justify-between items-center">
@@ -97,7 +91,7 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
                 <p>Orders</p>
               </Link>
               {/* <hr /> */}
-              <li onClick={logout}>
+              <li onClick={signOut}>
                 <img src={assets.logout_icon} alt="" />
                 <p>Log Out</p>
               </li>

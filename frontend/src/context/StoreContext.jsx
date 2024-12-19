@@ -1,41 +1,47 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
-import { LoginContext } from "./LoginContext";
+// import { LoginContext } from "./LoginContext";
 // import { food_list } from "../assets/assets";
+import { axiosInstance } from "./axiosConfig";
+import { useNavigate } from "react-router-dom";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
   const URL = "http://localhost:4000";
   const [food_list, setFoodList] = useState([]);
-
+  const [userDetails, setUserDetails] = useState({});
   const [token, setToken] = useState("");
   const [deliveryGuy, setDeliveryGuy] = useState([]);
   const [cartItems, setCartItems] = useState({});
+  const navigate = useNavigate();
 
   const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
-    if (token) {
-      await axios.post(
-        URL + "/api/cart/add",
-        { itemId },
-        { headers: { token } }
-      );
+    try {
+      if (!cartItems[itemId]) {
+        setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
+      } else {
+        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
+      }
+      if (token) {
+        await axiosInstance.post("/api/cart/add", { itemId });
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
     }
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    if (token) {
-      await axios.post(
-        URL + "/api/cart/remove",
-        { itemId },
-        { headers: { token } }
-      );
+    try {
+      setCartItems((prev) => ({
+        ...prev,
+        [itemId]: Math.max((prev[itemId] || 1) - 1, 0), // Prevent negative values
+      }));
+      if (token) {
+        await axiosInstance.post("/api/cart/remove", { itemId });
+      }
+    } catch (error) {
+      console.error("Error removing from cart:", error);
     }
   };
 
@@ -51,18 +57,19 @@ const StoreContextProvider = (props) => {
   };
 
   const fetchFoodList = async () => {
-    const response = await axios.get(URL + "/api/food/list");
-    setFoodList(response.data.data);
+    try {
+      const response = await axios.get(URL + "/api/food/list");
+      setFoodList(response.data.data);
+    } catch (error) {
+      console.error("Error fetching food list:", error);
+    }
   };
 
+  // Load cart data
   const loadCartData = async (token) => {
     try {
-      const response = await axios.post(
-        URL + "/api/cart/get",
-        {},
-        { headers: { token } }
-      );
-      setCartItems(response.data.cartData);
+      const response = await axiosInstance.post("/api/cart/get");
+      setCartItems(response.data.cartData || {});
     } catch (error) {
       console.error("Error loading cart data:", error);
     }
@@ -71,11 +78,9 @@ const StoreContextProvider = (props) => {
   const assignOrder = async (orderId) => {
     try {
       // Call the API to assign the order
-      const response = await axios.post(
-        `${URL}/api/order/assignOrder`,
-        { orderId }, // No need to include userId explicitly
-        { headers: { token } } // Include the token in the headers
-      );
+      const response = await axiosInstance.post("/api/order/assignOrder", {
+        orderId,
+      });
 
       if (response.data.success) {
         const deliveryBoy = response.data.deliveryBoy;
@@ -92,14 +97,16 @@ const StoreContextProvider = (props) => {
         );
       } else {
         console.error("Error assigning order:", response.data.message);
+        alert("Failed to assign delivery boy. Please try again.");
       }
     } catch (error) {
       console.error("Error assigning order:", error);
+      alert("An unexpected error occurred while assigning the order.");
     }
   };
 
   const updateProfile = async (phoneNumber, addressData) => {
-    const token = localStorage.getItem("Token"); // Assuming token is stored locally
+    // const token = localStorage.getItem("Token"); // Assuming token is stored locally
     // const userId = "REPLACE_WITH_ACTUAL_USER_ID"; // Replace dynamically as needed
 
     const payload = {
@@ -112,27 +119,54 @@ const StoreContextProvider = (props) => {
     };
 
     try {
-      const response = await fetch(URL + "/api/user/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Auth token from middleware
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await axiosInstance.post("/api/user/profile", payload);
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (response.data.success) {
         alert("Profile updated successfully!");
-        console.log("Updated User:", data.data);
+        console.log("Updated User:", response.data.data);
       } else {
-        alert(`Error: ${data.message}`);
+        alert(`Error: ${response.data.message}`);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("An error occurred while updating the profile.");
     }
+  };
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axiosInstance.get("/api/user/details");
+
+      if (response.data.success) {
+        setUserDetails(response.data.data);
+      } else {
+        console.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, orderStatus) => {
+    try {
+      const response = await axiosInstance.post("/api/user/status", {
+        orderId,
+        orderStatus,
+      });
+
+      return response.data; // Return the response data for success/failure handling
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      throw new Error("An error occurred while updating order status.");
+    }
+  };
+
+  const signOut = () => {
+    setToken(""); // Clear the token
+    setCartItems({}); // Clear the cart items
+    setUserDetails({}); // Clear user details
+    localStorage.removeItem("Token"); // Clear the token from localStorage
+    navigate("/");
   };
 
   //to store the token and prevent the logout when refreshed problem
@@ -141,11 +175,20 @@ const StoreContextProvider = (props) => {
       await fetchFoodList();
       if (localStorage.getItem("Token")) {
         setToken(localStorage.getItem("Token"));
-        await loadCartData(localStorage.getItem("Token"));
       }
     }
     loadData();
-  }, []);
+  }, []); // Only run once on component mount
+
+  useEffect(() => {
+    async function fetchData() {
+      if (token) {
+        await loadCartData(token);
+        await fetchUserDetails();
+      }
+    }
+    fetchData();
+  }, [token]); // Re-run whenever token changes
 
   const contextValue = {
     URL,
@@ -160,6 +203,9 @@ const StoreContextProvider = (props) => {
     assignOrder,
     deliveryGuy,
     updateProfile,
+    userDetails,
+    signOut,
+    updateOrderStatus,
   };
 
   return (

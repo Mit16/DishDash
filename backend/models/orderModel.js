@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema(
       phone2: { type: String, required: true },
     },
     address: { type: Object, required: true },
-    orderStatus: { type: String, default: "Food Processing" },
+    orderStatus: { type: String, default: "Ordered" },
     payment: { type: Boolean, default: false },
     deliveryBoy: {
       type: Object,

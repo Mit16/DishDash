@@ -1,20 +1,34 @@
 import { useContext, useEffect, useState } from "react";
 import "./MyOrders.css";
-import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
 import { assets } from "../../assets/assets";
+import { axiosInstance } from "../../context/axiosConfig";
 
 const MyOrders = () => {
-  const { URL, token } = useContext(StoreContext);
+  const { token, updateOrderStatus } = useContext(StoreContext);
   const [data, setData] = useState([]);
 
   const fetchOrders = async () => {
-    const response = await axios.post(
-      URL + "/api/order/userorders",
-      {},
-      { headers: { token } }
-    );
+    const response = await axiosInstance.post("/api/order/userorders");
     setData(response.data.data);
+  };
+
+  // Handles the order status change to "Cancelled"
+  const handleCancelOrder = async (orderId) => {
+    try {
+      const orderStatus = "Cancelled"; // Set status to "Cancelled"
+      const response = await updateOrderStatus(orderId, orderStatus);
+
+      if (response.success) {
+        alert("Order cancelled successfully");
+        // Refresh orders list after cancelling
+        fetchOrders();
+      } else {
+        alert("Failed to cancel order: " + response.message);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   useEffect(() => {
@@ -52,7 +66,15 @@ const MyOrders = () => {
             ) : (
               <p>No delivery boy assigned</p>
             )}
-            <button>Track Order</button>
+            <button type="button">Track Order</button>
+            {order.orderStatus !== "Cancelled" && (
+              <button
+                type="button"
+                onClick={() => handleCancelOrder(order._id)}
+              >
+                Cancel Order
+              </button>
+            )}
           </div>
         ))}
       </div>

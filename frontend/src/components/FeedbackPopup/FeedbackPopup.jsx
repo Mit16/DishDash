@@ -3,9 +3,13 @@ import "./FeedbackPopup.css";
 import { assets } from "../../assets/assets";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { StoreContext } from "../../context/StoreContext";
 
 const FeedbackPopup = ({ setShowFeedback }) => {
   const navigate = useNavigate();
+
+  const { URL } = useContext(StoreContext);
 
   const [feedbackData, setFeedbackData] = useState({
     email: "",
@@ -25,10 +29,7 @@ const FeedbackPopup = ({ setShowFeedback }) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/api/feedback",
-        feedbackData
-      ); // Adjust the URL to match your backend
+      const response = await axios.post(URL + "/api/feedback", feedbackData); // Adjust the URL to match your backend
       if (response.data.success) {
         alert("Feedback submitted successfully!");
         setShowFeedback(false);
@@ -83,7 +84,9 @@ const FeedbackPopup = ({ setShowFeedback }) => {
             Expect a response?
           </label>
         </div>
-        <button type="submit" onClick={()=> navigate("/")}>Submit</button>
+        <button type="submit" onClick={() => navigate("/")}>
+          Submit
+        </button>
       </form>
     </div>
   );
