@@ -9,7 +9,7 @@ const PlaceOrder = () => {
     getTotalCartAmount,
     userDetails,
     token,
-    food_list,
+    foodList,
     cartItems,
     setCartItems,
   } = useContext(StoreContext);
@@ -68,13 +68,33 @@ const PlaceOrder = () => {
     event.preventDefault();
 
     try {
-      // Prepare order items
-      const orderItems = food_list
-        .filter((item) => cartItems[item._id] > 0)
-        .map((item) => ({
-          ...item,
-          quantity: cartItems[item._id],
-        }));
+      // Log cart items and food list for debugging
+      console.log("Food List:", foodList);
+      console.log("Cart Items:", cartItems);
+      const orderItems = foodList
+        .flatMap((category) =>
+          category.dishes.map((dish) => ({
+            ...dish,
+            restaurant: category.restaurant,
+          }))
+        )
+        .filter((dish) => cartItems[dish._id] && cartItems[dish._id] > 0)
+        .map((dish) => ({
+          itemId: dish._id,
+          name: dish.name,
+          price: dish.price,
+          quantity: cartItems[dish._id],
+          restaurantId: dish.restaurant.id,
+        }))
+        .filter((item) => item.restaurantId);
+
+      console.log("Mapped Order Items:", orderItems);
+
+      // Check for empty order items
+      if (!orderItems || orderItems.length === 0) {
+        alert("Your cart is empty. Add items before placing the order.");
+        return;
+      }
 
       // Prepare order data
       const orderData = {
@@ -82,17 +102,17 @@ const PlaceOrder = () => {
         items: orderItems,
         deliveryAmount: Math.max(getTotalCartAmount() / 10, 40),
         amount: getTotalCartAmount() + Math.max(getTotalCartAmount() / 10, 40),
-        customerDetails: {
-          name: `${customerDetails.firstname} ${customerDetails.lastname}`,
-          phone1: customerDetails.phone1,
-          phone2: customerDetails.phone2,
-        },
+        paymentMethod: "Online", // Add a valid payment method
       };
 
+      console.log("Order data being sent:", orderData);
+
       // Place the order
-      const response = await axiosInstance.post("/api/order/place", orderData);
+      const response = await axiosInstance.post("/api/orders/place", orderData);
 
       if (response.data.success) {
+        console.log("Order placed successfully:", response.data);
+        alert("Order placed successfully!");
         setShowPopup(true); // Show popup on successful order placement
         setCartItems({}); // Clear the cart
 
@@ -108,7 +128,7 @@ const PlaceOrder = () => {
 
         // Assign the order to a delivery boy
         const assignResponse = await axiosInstance.post(
-          "/api/order/assignOrder",
+          "/api/orders/assignorder",
           { orderId }
         );
 
@@ -218,15 +238,6 @@ const PlaceOrder = () => {
               value={addressData.zipcode}
               placeholder="Zip-Code"
             />
-            {/* <input
-              required
-              defaultValue="India"
-              type="text"
-              name="country"
-              onChange={onChangeHandler}
-              value={data.country}
-              placeholder="Country"
-            /> */}
           </div>
           <input
             required

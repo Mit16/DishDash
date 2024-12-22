@@ -2,54 +2,68 @@
   margin: 50px 0px;
 }
 
-.my-orders .container {
+.orders-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  margin-top: 30px;
+  gap: 20px;
+  margin-top: 20px;
 }
 
-.my-orders-order {
-  display: grid;
-  grid-template-columns: 0.5fr 2fr 1fr 1fr 2fr 1fr;
-  align-items: center;
-  gap: 30px;
-  font-size: 14px;
-  padding: 10px 20px;
-  color: #454545;
-  border: 1px solid tomato;
+.order-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.my-orders-order img {
-  width: 50px;
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-.my-orders-order p span {
-  color: tomato;
+.order-header h3 {
+  font-size: 16px;
+  color: #333;
 }
 
-.my-orders-order p b {
-  font-weight: 500;
-  color: #454545;
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
 }
 
-.my-orders-order button {
+.status.cancelled {
+  color: red;
+}
+
+.status.completed {
+  color: green;
+}
+
+.order-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.order-details ul li {
+  margin-bottom: 5px;
+}
+
+.restaurant-info,
+.delivery-info {
+  margin-top: 20px;
+}
+
+.order-actions button {
   border: none;
-  padding: 12px 0px;
+  padding: 10px 15px;
   border-radius: 5px;
-  background-color: #ffe1e1;
-  color: #454545;
+  background-color: tomato;
+  color: white;
   cursor: pointer;
 }
 
-@media (max-width: 900px) {
-  .my-orders-order {
-    grid-template-columns: 1fr 2fr 1fr;
-    row-gap: 5px;
-    font-size: 12px;
-  }
-
-  .my-orders-order button {
-    font-size: 10px;
-  }
+.order-actions button:hover {
+  background-color: #d9534f;
 }

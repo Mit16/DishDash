@@ -9,6 +9,9 @@ import feedbackrouter from "./routes/feedbackRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import deliveryRouter from "./routes/deliveryRoute.js";
 // import "./utils/ceonJobs.js"
+import restaurentRouter from "./routes/restaurantRoutes.js";
+import menuRouter from "./routes/menuRoutes.js";
+import orderRoutes from "./routes/order.Routes.js";
 
 //app config
 const app = express();
@@ -27,12 +30,11 @@ app.use("/images", express.static("uploads"));
 app.use("/api/user", userRouter);
 app.use("/api/delivery", deliveryRouter);
 app.use("/api/cart", cartRouter);
-app.use("/api/order", orderRouter);
+// app.use("/api/orders", orderRoutes);
+app.use("/api/orders", orderRouter);
 app.use("/api/feedback", feedbackrouter);
-
-app.get("/", (req, res) => {
-  res.send("API Working");
-});
+app.use("/api/restaurants", restaurentRouter);
+app.use("/api/menu", menuRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

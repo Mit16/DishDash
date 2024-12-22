@@ -1,13 +1,13 @@
-const { body, validationResult } = require('express-validator');
+const { body, validationResult } = require("express-validator");
 
 // Validation rules
 const validateFood = [
-  body('name').notEmpty().withMessage('Name is required'),
-  body('description').notEmpty().withMessage('Description is required'),
-  body('price')
+  body("name").notEmpty().withMessage("Name is required"),
+  body("description").notEmpty().withMessage("Description is required"),
+  body("price")
     .isFloat({ min: 0.01 })
-    .withMessage('Price must be a positive number'),
-  body('category').notEmpty().withMessage('Category is required'),
+    .withMessage("Price must be a positive number"),
+  body("category").notEmpty().withMessage("Category is required"),
 ];
 
 // Middleware to check validation results

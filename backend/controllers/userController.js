@@ -1,5 +1,6 @@
 import userModel from "../models/userModel.js";
 import deliveryGuyModel from "../models/deliveryModel.js";
+import restaurentModel from "../models/RestaurentModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -190,6 +191,7 @@ const getUserDetails = async (req, res) => {
 const getModel = (accountType) => {
   if (accountType === "Customer") return userModel;
   if (accountType === "DeliveryAgent") return deliveryGuyModel;
+  if (accountType === "Restaurant") return restaurentModel;
   return null;
 };
 

@@ -22,10 +22,12 @@ const userSchema = new mongoose.Schema(
     },
     address: { type: Object, default: {} },
     cartData: { type: Object, default: {} },
+    // cartData: { type: Map, of: Number, default: {} }, // Use Map for better key-value handling
+    profileCompleted: { type: Boolean, default: false },
   },
   { minimize: false }
 );
 
-const userModel = mongoose.model.user || mongoose.model("user", userSchema);
+const userModel = mongoose.models.user || mongoose.model("user", userSchema);
 
 export default userModel;

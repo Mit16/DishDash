@@ -7,7 +7,7 @@ import main_logo from "../../assets/main_logo.png";
 
 const Navbar = ({ setShowSignin, setShowFeedback }) => {
   const [menu, setMenu] = useState("Home");
-  const { token, signOut } = useContext(StoreContext);
+  const { token, signOut, cartItems } = useContext(StoreContext);
   const { getTotalCartAmount } = useContext(StoreContext);
   const navigate = useNavigate();
 
@@ -75,7 +75,9 @@ const Navbar = ({ setShowSignin, setShowFeedback }) => {
                 ? ""
                 : "dot absolute min-w-2.5 min-h-2.5 bg-orange-500 rounded -top-2 -right-2"
             }
-          ></div>
+          >
+            {cartItems.length}
+          </div>
         </div>
         {!token ? (
           <>

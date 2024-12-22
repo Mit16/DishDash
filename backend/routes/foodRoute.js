@@ -20,12 +20,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// const storage = multer.diskStorage({
-//   destination: "uploads",
-//   filename: (req, fie, cb) => {
-//     return cd(null, `${Date.now()}${file.originalname}`);
-//   },
-// });
 
 const uploads = multer({ storage: storage });
 
@@ -34,3 +28,10 @@ foodRouter.get("/list", listFood);
 foodRouter.post("/remove", removeFood);
 
 export default foodRouter;
+
+// const storage = multer.diskStorage({
+//   destination: "uploads",
+//   filename: (req, fie, cb) => {
+//     return cd(null, `${Date.now()}${file.originalname}`);
+//   },
+// });

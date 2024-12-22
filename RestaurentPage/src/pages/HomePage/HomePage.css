@@ -1,0 +1,74 @@
+.home-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.welcome-section h2 {
+  font-size: 2rem;
+  color: #333;
+}
+
+.orders-section,
+.dishes-section {
+  margin-bottom: 30px;
+}
+
+.orders-section h3,
+.dishes-section h3 {
+  font-size: 1.5rem;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+.orders-list,
+.dishes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.orders-list li,
+.dishes-list li {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.orders-list li p,
+.dishes-list li p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.add-dish-btn,
+.remove-dish-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.add-dish-btn:hover {
+  background-color: #45a049;
+}
+
+.remove-dish-btn {
+  background-color: #f44336;
+}
+
+.remove-dish-btn:hover {
+  background-color: #d32f2f;
+}

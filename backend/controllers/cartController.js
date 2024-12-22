@@ -23,6 +23,14 @@ const addToCart = async (req, res) => {
 
     let cartData = userData.cartData || {}; // Ensure cartData is an object
 
+    // cartData[itemId] = (cartData[itemId] || 0) + 1; // Increment item count
+
+    // // Save updated cart
+    // userData.cartData = cartData;
+    // await userData.save();
+
+    // return res.json({ success: true, message: "Item added to cart", cartData });
+
     // Update cart data
     if (!cartData[itemId]) {
       cartData[itemId] = 1;
@@ -39,7 +47,6 @@ const addToCart = async (req, res) => {
   }
 };
 
-// Remove items from user cart
 const removeFromCart = async (req, res) => {
   try {
     const userId = req.user._id; // Extract userId from middleware
@@ -51,35 +58,39 @@ const removeFromCart = async (req, res) => {
     }
 
     // Find user
-    let userData = await userModel.findById(userId);
-
-    // Handle missing user
+    const userData = await userModel.findById(userId);
     if (!userData) {
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
     }
 
-    let cartData = userData.cartData || {}; // Ensure cartData is an object
+    // Ensure cartData exists
+    const cartData = userData.cartData || {};
 
     // Update cart data
-    if (cartData[itemId] > 0) {
+    if (cartData[itemId]) {
       cartData[itemId] -= 1;
 
-      // Remove item from cart if quantity is 0
-      if (cartData[itemId] === 0) {
+      // Remove item if quantity reaches 0
+      if (cartData[itemId] <= 0) {
         delete cartData[itemId];
       }
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Item not in cart" });
     }
 
-    // Save the updated cart
+    // Save updated cart
     await userModel.findByIdAndUpdate(userId, { cartData });
+
     res.json({ success: true, message: "Item removed from cart" });
   } catch (error) {
-    console.error(error);
+    console.error("Error in removeFromCart:", error);
     res.status(500).json({
       success: false,
-      message: "Error: Unable to remove the cart item",
+      message: "Server error: Unable to remove the cart item",
     });
   }
 };

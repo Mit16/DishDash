@@ -45,12 +45,14 @@ const deliveryGuySchema = new mongoose.Schema(
     accountHolderName: { type: String },
     ifscCode: { type: String },
     deliveryArea: { type: String },
+    profileCompleted: { type: Boolean, default: false }
+
   },
   { minimize: false }
 );
 
 const deliveryGuyModel =
-  mongoose.model.deliveryusers ||
+  mongoose.models.deliveryusers ||
   mongoose.model("deliveryusers", deliveryGuySchema);
 
 export default deliveryGuyModel;

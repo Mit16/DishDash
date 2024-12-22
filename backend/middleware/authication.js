@@ -20,12 +20,10 @@ const authMiddleware = (req, res, next) => {
 
       next(); // Proceed to the next middleware or route handler
     } else {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Unauthorized: Invalid token format",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Invalid token format",
+      });
     }
   } catch (error) {
     console.error("Error in token verification:", error);

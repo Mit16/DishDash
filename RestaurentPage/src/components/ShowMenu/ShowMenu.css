@@ -1,0 +1,145 @@
+/* General styling */
+body {
+  font-family: Arial, sans-serif;
+}
+
+.add-food-link {
+  display: inline-block;
+  margin: 20px;
+  padding: 10px 15px;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.add-food-link:hover {
+  background-color: #45a049;
+}
+
+/* Menu card styling */
+.menu-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.menu-card {
+  width: 250px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.menu-card:hover {
+  transform: scale(1.03);
+}
+
+.menu-card-image {
+  height: 150px;
+  overflow: hidden;
+}
+
+.menu-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-card-details {
+  padding: 10px;
+}
+
+.menu-card-details h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.menu-card-details p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.availability-toggle {
+  background-color: #f0ad4e;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.availability-toggle:hover {
+  background-color: #ec971f;
+}
+
+.view-details-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.view-details-button:hover {
+  background-color: #0056b3;
+}
+
+/* Dish details overlay */
+.dish-details-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dish-details {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+
+.dish-details img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.dish-details h2 {
+  margin-top: 0;
+}
+
+.dish-details p {
+  margin: 10px 0;
+  color: #333;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #888;
+}
+
+.close-button:hover {
+  color: #000;
+}

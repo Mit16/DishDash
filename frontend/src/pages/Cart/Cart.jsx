@@ -1,21 +1,31 @@
 import React, { useContext } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
-import { isRouteErrorResponse } from "react-router-dom";
+// import { isRouteErrorResponse } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart, getTotalCartAmount } =
+  const { cartItems, foodList, removeFromCart, getTotalCartAmount } =
     useContext(StoreContext);
 
   const navigate = useNavigate();
+
+  // Flatten foodList to map item IDs directly
+  const flattenedFoodList = foodList.flatMap((category) =>
+    category.dishes.map((dish) => ({
+      ...dish,
+      restaurant: category.restaurant.name,
+    }))
+  );
 
   return (
     <div className="cart">
       <div className="cart-items">
         <div className="cart-items-title">
-          <p>Items</p>
+          <p>Image</p>
           <p>Title</p>
+          <p>Restaurant</p>
+          <p>Availability</p>
           <p>Price</p>
           <p>Quantity</p>
           <p>Total</p>
@@ -23,24 +33,37 @@ const Cart = () => {
         </div>
         <br />
         <hr />
-        {food_list.map((item, index) => {
-          if (cartItems[item._id] > 0) {
+        {Object.keys(cartItems).map((itemId) => {
+          const item = flattenedFoodList.find((dish) => dish._id === itemId);
+          if (item) {
             return (
-              <>
-                <div key={index} className="cart-items-title cart-items-item">
-                  <img src={item.image} alt="" />
+              <div key={item._id} className="cart-items-title cart-items-item">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="cart-item-img"
+                />
+                <div>
                   <p>{item.name}</p>
-                  <p>₹ {item.price}</p>
-                  <p>{cartItems[item._id]}</p>
-                  <p>₹ {item.price * cartItems[item._id]}</p>
-                  <p onClick={() => removeFromCart(item._id)} className="cross">
-                    ❌
-                  </p>
                 </div>
-                <hr />
-              </>
+                <p>{item.restaurant}</p>
+                <p className="item-availability">
+                  {item.availability ? "Available" : "Out of Stock"}
+                </p>
+                <p>₹ {item.price}</p>
+                <p>{cartItems[itemId]}</p>
+                <p>₹ {item.price * cartItems[itemId]}</p>
+                <p
+                  onClick={() => removeFromCart(itemId)}
+                  className="cross"
+                  title="Remove item"
+                >
+                  ❌
+                </p>
+              </div>
             );
           }
+          return null; // Skip if the item is not found in the list
         })}
       </div>
       <div className="cart-bottom">
@@ -79,7 +102,7 @@ const Cart = () => {
         </div>
         <div className="cart-promocode">
           <div>
-            <p>If you have promo code,Enter it here</p>
+            <p>If you have a promo code, enter it here:</p>
             <div className="cart-promocode-input">
               <input type="text" placeholder="Enter a Promocode" />
               <button>Submit</button>
