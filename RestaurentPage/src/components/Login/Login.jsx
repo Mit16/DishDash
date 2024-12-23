@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { RestaurentContext } from "../../context/RestaurentContext";
 import { MenuContext } from "../../context/MenuContext";
+import CompleteProfile from "../CompleteProfile/CompleteProfile";
 
 const Login = () => {
   const navigate = useNavigate();
   const { setMenuItems } = useContext(MenuContext);
+  const [secondRegister, setSecondregister] = useState(false);
   const { apiURL, Signin, profileCompleted, fetchRestaurentDetails } =
     useContext(RestaurentContext);
   const [currState, setCurrState] = useState("Sign In");
@@ -54,15 +56,15 @@ const Login = () => {
         // console.log("Login Success:", response.data);
 
         // Corrected: Accessing profileCompleted
-        const isProfileCompleted = response.data?.profileCompleted ?? false;
+        // const isProfileCompleted = response.data?.profileCompleted ?? false;
 
         // Sign in and navigate
         await Signin(response.data.token);
         setMenuItems([]);
-        if (isProfileCompleted) {
+        if (!secondRegister) {
           navigate("/home");
         } else {
-          navigate("/complete-profile");
+          navigate("/update-profile");
         }
       } else {
         alert(response.data.message);
@@ -132,7 +134,15 @@ const Login = () => {
           <input type="checkbox" required />
           <p>Agree to Terms & Conditions</p>
         </div>
-        <button className="register-btn" type="submit">
+        <button
+          onClick={() => {
+            if (currState === "Sign Up") {
+              setSecondregister(true);
+            }
+          }}
+          className="register-btn"
+          type="submit"
+        >
           {currState === "Sign Up" ? "Create new account" : "Sign In"}
         </button>
         {currState === "Sign In" ? (
@@ -157,7 +167,6 @@ const Login = () => {
           </p>
         )}
       </form>
-      {/* Additional componentes just for show */}
     </div>
   );
 };

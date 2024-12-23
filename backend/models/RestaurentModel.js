@@ -33,6 +33,19 @@ const restaurantSchema = new mongoose.Schema(
     licenseNumber: { type: String },
     isActive: { type: Boolean, default: true },
     profileCompleted: { type: Boolean, default: false },
+    ordersAssigned: [
+      {
+        orderId: { type: mongoose.Schema.Types.ObjectId, ref: "order" },
+        items: [
+          {
+            itemId: { type: mongoose.Schema.Types.ObjectId, ref: "Menu" },
+            name: { type: String },
+            price: { type: Number },
+            quantity: { type: Number },
+          },
+        ],
+      },
+    ],
   },
   { timestamps: true, minimize: false }
 );

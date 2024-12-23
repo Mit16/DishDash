@@ -6,6 +6,7 @@ import {
   listOrders,
   updateStatus,
   assignOrder,
+  getOrderByRestaurant,
 } from "../controllers/orderController.js";
 import validateOrder from "../validators/orderValidator.js";
 
@@ -16,5 +17,11 @@ orderRouter.post("/userorders", authMiddleware, userOrders);
 orderRouter.get("/list", listOrders);
 orderRouter.post("/status", updateStatus);
 orderRouter.post("/assignorder", authMiddleware, assignOrder);
+// Get orders for a specific restaurant
+orderRouter.get(
+  "/restaurant/:restaurantId",
+  authMiddleware,
+  getOrderByRestaurant
+);
 
 export default orderRouter;

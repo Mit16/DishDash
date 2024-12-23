@@ -1,12 +1,12 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import deliveryGuyModel from "../models/deliveryModel.js";
+import restaurentModel from "../models/RestaurentModel.js";
 import mongoose from "mongoose";
 
 //Placing user order from frontend
 const placeOrder = async (req, res) => {
   try {
-    // console.log("Request body:", req.body);
     const { items, deliveryAmount, amount, address, paymentMethod } = req.body;
 
     // Create new order
@@ -24,6 +24,9 @@ const placeOrder = async (req, res) => {
     // Save the order to the database
     const savedOrder = await newOrder.save();
 
+    // Assign order to restaurants
+    await assignOrdersToRestaurants(items, savedOrder._id);
+
     // Clear user cart after order placement
     await userModel.findByIdAndUpdate(req.user._id, { cartData: {} });
 
@@ -38,6 +41,42 @@ const placeOrder = async (req, res) => {
       success: false,
       message: "Internal server error while placing order.",
     });
+  }
+};
+
+const assignOrdersToRestaurants = async (orderItems, orderId) => {
+  try {
+    const groupedOrders = orderItems.reduce((acc, item) => {
+      const { restaurantId } = item;
+      if (!restaurantId) {
+        console.error("Missing restaurantId for item:", item);
+      }
+      if (!acc[restaurantId]) {
+        acc[restaurantId] = [];
+      }
+      acc[restaurantId].push(item);
+      return acc;
+    }, {});
+
+    for (const restaurantId in groupedOrders) {
+      await restaurentModel.findByIdAndUpdate(
+        restaurantId,
+        {
+          $push: {
+            ordersAssigned: {
+              orderId: orderId,
+              items: groupedOrders[restaurantId],
+            },
+          },
+        },
+        { new: true }
+      );
+    }
+
+    // console.log("Orders successfully assigned to restaurants.");
+  } catch (error) {
+    console.error("Error assigning orders to restaurants:", error);
+    throw new Error("Failed to assign orders to restaurants.");
   }
 };
 
@@ -159,4 +198,25 @@ const updateStatus = async (req, res) => {
   }
 };
 
-export { placeOrder, userOrders, listOrders, updateStatus, assignOrder };
+// Get orders for a specific restaurant
+const getOrderByRestaurant = async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const orders = await orderModel
+      .find({ restaurantId })
+      .populate("customerId", "name email")
+      .populate("dishes.dishId", "name price");
+    res.status(200).json({ data: orders });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export {
+  placeOrder,
+  userOrders,
+  listOrders,
+  updateStatus,
+  assignOrder,
+  getOrderByRestaurant,
+};

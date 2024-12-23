@@ -1,20 +1,21 @@
 import React, { useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { RestaurentContext } from "../../context/RestaurentContext";
 import "./CompleteProfile.css";
+import { RestaurentContext } from "../../context/RestaurentContext";
+import { useNavigate } from "react-router-dom";
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
   const {
-    restaurantId,
     updateRestaurant,
     updateDetails,
     fetchRestaurantById,
     toggleRestaurantProfileStatus,
     setUpdateDetails,
+    restaurantDetails,
   } = useContext(RestaurentContext);
 
   const [profileData, setProfileData] = useState({
+    restaurentName: "",
     phone: "",
     address: {
       street: "",
@@ -32,63 +33,31 @@ const CompleteProfile = () => {
 
   // Use `fetchRestaurantById` in `useEffect`:
   useEffect(() => {
-    if (restaurantId) {
-      fetchRestaurantById()
-        .then((details) => {
-          if (details) {
-            setProfileData((prev) => ({
-              ...prev,
-              ...details, // Merge fetched details into state
-            }));
-          }
-        })
-        .catch((error) =>
-          console.error("Error fetching details for profile:", error)
-        );
+    if (updateDetails && restaurantDetails) {
+      setProfileData({
+        restaurentName: restaurantDetails.restaurentName || "",
+        phone: restaurantDetails.phone || "",
+        address: {
+          street: restaurantDetails.address?.street || "",
+          city: restaurantDetails.address?.city || "",
+          state: restaurantDetails.address?.state || "",
+          zipcode: restaurantDetails.address?.zipcode || "",
+          country: restaurantDetails.address?.country || "",
+        },
+        openingHours: {
+          week: {
+            start: restaurantDetails.openingHours?.week?.start || "",
+            end: restaurantDetails.openingHours?.week?.end || "",
+          },
+          Sunday: {
+            start: restaurantDetails.openingHours?.Sunday?.start || "",
+            end: restaurantDetails.openingHours?.Sunday?.end || "",
+          },
+        },
+        licenseNumber: restaurantDetails.licenseNumber || "",
+      });
     }
-  }, [restaurantId]);
-
-  // Fetch existing restaurant details if restaurantId is available
-  useEffect(() => {
-    const fetchRestaurantDetails = async () => {
-      try {
-        const response = await fetchRestaurantById(); // Fetch details by ID
-        if (response?.data?.success) {
-          const details = response.data.data;
-          setProfileData({
-            phone: details.phone || "",
-            address: {
-              street: details.address?.street || "",
-              city: details.address?.city || "",
-              state: details.address?.state || "",
-              zipcode: details.address?.zipcode || "",
-              country: details.address?.country || "",
-            },
-            openingHours: {
-              week: {
-                start: details.openingHours?.week?.start || "",
-                end: details.openingHours?.week?.end || "",
-              },
-              Sunday: {
-                start: details.openingHours?.Sunday?.start || "",
-                end: details.openingHours?.Sunday?.end || "",
-              },
-            },
-            licenseNumber: details.licenseNumber || "",
-          });
-        } else {
-          console.error("Failed to fetch restaurant details");
-        }
-      } catch (error) {
-        console.error("Error fetching restaurant details:", error);
-      }
-    };
-
-    // Fetch data if restaurantId exists
-    if (restaurantId) {
-      fetchRestaurantDetails();
-    }
-  }, [restaurantId]);
+  }, [updateDetails, restaurantDetails]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -116,10 +85,6 @@ const CompleteProfile = () => {
     }
   };
 
-  // if (!restaurantId || !profileData) {
-  //   return <p>Loading...</p>;
-  // }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -146,6 +111,14 @@ const CompleteProfile = () => {
 
   return (
     <form onSubmit={handleSubmit} className="profile-container">
+      <input
+        type="text"
+        name="restaurentName"
+        placeholder="Restaurent Name"
+        value={profileData.restaurentName || "N/A"}
+        onChange={handleChange}
+        required
+      />
       <input
         type="text"
         name="phone"
@@ -228,11 +201,18 @@ const CompleteProfile = () => {
         required
       />
       {updateDetails ? (
-        <>
+        <div className="button-group">
           <button type="submit" onClick={() => setUpdateDetails(false)}>
             Update Profile
           </button>
-        </>
+          <button
+            type="button"
+            className="cancel-button"
+            onClick={() => navigate("/home")}
+          >
+            Cancel
+          </button>
+        </div>
       ) : (
         <>
           <input

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../context/axiosConfig";
 
 const PlaceOrder = () => {
+  const navigate = useNavigate();
   const {
     getTotalCartAmount,
     userDetails,
@@ -149,8 +150,6 @@ const PlaceOrder = () => {
       alert("An unexpected error occurred.");
     }
   };
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!token || getTotalCartAmount() === 0) {
