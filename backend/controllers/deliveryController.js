@@ -81,12 +81,16 @@ const getAssignedOrders = async (req, res) => {
         .json({ success: false, message: "Unauthorized access" });
     }
 
-    // Find the delivery guy and populate assigned orders
+    // Find the delivery boy and populate assigned orders with restaurant details
     const deliveryBoy = await DeliveryGuy.findById(userId).populate({
       path: "ordersAssigned",
-      // Fetch required fields
+      populate: {
+        path: "items.restaurantId",
+        model: "Restaurant", // Explicitly specify the model
+        select: "restaurentName phone address",
+      },
       select:
-        "items customerDetails address orderStatus amount deliveryAmount payment createdAt",
+        "items address orderStatus amount deliveryAmount paymentMethod createdAt",
     });
 
     if (!deliveryBoy || deliveryBoy.accountType !== "Delivery") {
@@ -96,9 +100,32 @@ const getAssignedOrders = async (req, res) => {
       });
     }
 
+    // Format the data to include only the required fields
+    const formattedOrders = deliveryBoy.ordersAssigned.map((order) => ({
+      orderId: order._id,
+      customerAddress: order.address,
+      orderStatus: order.orderStatus,
+      paymentMethod: order.paymentMethod,
+      createdAt: order.createdAt,
+      deliveryAmount: order.deliveryAmount,
+      amount: order.amount, // Fetch total amount for cash on delivery
+      items: order.items.map((item) => ({
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        restaurant: item.restaurantId
+          ? {
+              restaurentName: item.restaurantId.restaurentName,
+              phone: item.restaurantId.phone,
+              address: item.restaurantId.address,
+            }
+          : null,
+      })),
+    }));
+
     res.status(200).json({
       success: true,
-      data: deliveryBoy.ordersAssigned,
+      data: formattedOrders,
     });
   } catch (error) {
     console.error("Error fetching assigned orders:", error);
@@ -161,35 +188,39 @@ const deliveredOrders = async (req, res) => {
   }
 
   try {
-    // Find the delivery guy and populate assigned orders
-    const deliveryBoyOrders = await DeliveryGuy.findById(userId).populate({
+    // Fetch only the delivered orders directly using a query
+    const deliveryBoy = await DeliveryGuy.findById(userId).populate({
       path: "ordersAssigned",
-      // Fetch required fields
-      select:
-        "items customerDetails orderStatus amount deliveryAmount payment createdAt",
+      match: { orderStatus: "Delivered" }, // Fetch only delivered orders
+      select: "address amount deliveryAmount createdAt", // Select only required fields
     });
 
-    if (!deliveryBoyOrders) {
+    if (!deliveryBoy) {
       return res.status(404).json({
         success: false,
         message: "Delivery person not found.",
       });
     }
 
-    // Filter orders with status "Delivered"
-    const orders = deliveryBoyOrders.ordersAssigned.filter(
-      (order) => order.orderStatus === "Delivered"
-    );
+    const deliveredOrders = deliveryBoy.ordersAssigned;
 
-    if (!orders.length) {
+    if (!deliveredOrders || deliveredOrders.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No delivered orders found.",
       });
     }
 
-    // Send filtered orders in response
-    res.status(200).json({ success: true, orders });
+    // Format the response to only include essential details
+    const formattedOrders = deliveredOrders.map((order) => ({
+      orderId: order._id,
+      address: order.address,
+      amount: order.amount,
+      deliveryAmount: order.deliveryAmount,
+      deliveredAt: order.createdAt,
+    }));
+
+    res.status(200).json({ success: true, orders: formattedOrders });
   } catch (err) {
     console.error("Error fetching delivered orders:", err);
     res.status(500).json({ success: false, error: "Failed to fetch orders" });

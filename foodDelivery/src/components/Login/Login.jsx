@@ -7,7 +7,7 @@ import { DeliveryContext } from "../../context/Delivery.context";
 
 const Login = () => {
   const navigate = useNavigate();
-
+  const [secondRegister, setSecondregister] = useState(false);
   const { apiURL, setToken, Signin } = useContext(DeliveryContext);
   const [currState, setCurrState] = useState("Sign In");
   const [data, setData] = useState({
@@ -57,10 +57,10 @@ const Login = () => {
       alert(response.data.message);
     }
 
-    if (response.data.success) {
-      navigate("/dashboard");
+    if (!secondRegister) {
+      navigate("/home");
     } else {
-      setCurrState("Sign Up");
+      navigate("/dashboard");
     }
   };
 
@@ -123,7 +123,14 @@ const Login = () => {
           <input type="checkbox" required />
           <p>Agree to Terms & Conditions</p>
         </div>
-        <button type="submit">
+        <button
+          onClick={() => {
+            if (currState === "Sign Up") {
+              setSecondregister(true);
+            }
+          }}
+          type="submit"
+        >
           {currState === "Sign Up" ? "Create new account" : "Sign In"}
         </button>
         {currState === "Sign In" ? (

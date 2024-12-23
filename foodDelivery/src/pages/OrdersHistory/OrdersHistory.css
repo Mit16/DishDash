@@ -1,4 +1,4 @@
-.order-list {
+.order-history {
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -12,7 +12,7 @@
   background-color: #ffffff;
 }
 
-.order-item h3 {
+.order-item h4 {
   margin: 0;
   font-size: 18px;
   color: #333;
@@ -22,6 +22,21 @@
   margin: 5px 0;
   font-size: 14px;
   color: #555;
+}
+
+.restaurant-details {
+  margin-left: 10px;
+  font-style: italic;
+  color: #777;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 5px;
 }
 
 button {
