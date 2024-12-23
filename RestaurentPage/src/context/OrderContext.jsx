@@ -1,32 +1,22 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { axiosInstance } from "./axiosConfig";
 
-const OrderContext = createContext(null);
+export const OrderContext = createContext(null);
 
 const OrderContextProvider = (props) => {
-  // Create a new order
-  const createOrder = async (orderData) => {
-    try {
-      const response = await axiosInstance.post("/orders", orderData);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to create order"
-      );
-    }
-  };
+  const [assignedOrders, setAssignedOrders] = useState([]);
 
   // Get all orders (Admin use case)
-  const getAllOrders = async () => {
-    try {
-      const response = await axiosInstance.get("/orders");
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch orders"
-      );
-    }
-  };
+  // const getAllOrders = async () => {
+  //   try {
+  //     const response = await axiosInstance.get("/orders");
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new Error(
+  //       error.response?.data?.message || "Failed to fetch orders"
+  //     );
+  //   }
+  // };
 
   // Get orders for a specific customer
   const getOrdersByCustomer = async (customerId) => {
@@ -43,11 +33,10 @@ const OrderContextProvider = (props) => {
   };
 
   // Get orders for a specific restaurant
-  const getOrdersByRestaurant = async (restaurantId) => {
+  const getOrdersByRestaurant = async () => {
     try {
-      const response = await axiosInstance.get(
-        `/orders/restaurant/${restaurantId}`
-      );
+      const response = await axiosInstance.get(`/api/orders/restaurant-orders`);
+      setAssignedOrders(response.data.data);
       return response.data;
     } catch (error) {
       throw new Error(
@@ -57,28 +46,30 @@ const OrderContextProvider = (props) => {
   };
 
   // Get a specific order by ID
-  const getOrderById = async (orderId) => {
-    try {
-      const response = await axiosInstance.get(`/orders/${orderId}`);
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch order details"
-      );
-    }
-  };
+  // const getOrderById = async (orderId) => {
+  //   try {
+  //     const response = await axiosInstance.get(`/orders/${orderId}`);
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new Error(
+  //       error.response?.data?.message || "Failed to fetch order details"
+  //     );
+  //   }
+  // };
 
   // Update order status
-  const updateOrderStatus = async (orderId, status) => {
+
+  const updateOrderStatus = async (orderId, orderStatus) => {
     try {
-      const response = await axiosInstance.put(`/orders/${orderId}/status`, {
-        status,
+      const response = await axiosInstance.post("/api/orders/status", {
+        orderId,
+        orderStatus,
       });
-      return response.data;
+
+      return response.data; // Return the response data for success/failure handling
     } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to update order status"
-      );
+      console.error("Error updating order status:", error);
+      throw new Error("An error occurred while updating order status.");
     }
   };
 
@@ -95,13 +86,11 @@ const OrderContextProvider = (props) => {
   };
 
   const OrderContextValue = {
-    createOrder,
-    getAllOrders,
     getOrdersByCustomer,
     getOrdersByRestaurant,
-    getOrderById,
     updateOrderStatus,
     deleteOrder,
+    assignedOrders,
   };
 
   return (

@@ -4,7 +4,7 @@ import {
   createOrder,
   getAllOrders,
   getOrdersByCustomer,
-  getOrderByRestaurant,
+  // getOrderByRestaurant,
   getOrderById,
   updateOrderStatus,
   deleteOrder,
@@ -22,11 +22,11 @@ orderRoutes.get("/", authMiddleware, getAllOrders);
 orderRoutes.get("/customer/:customerId", authMiddleware, getOrdersByCustomer);
 
 // Get orders for a specific restaurant
-orderRoutes.get(
-  "/restaurant/:restaurantId",
-  authMiddleware,
-  getOrderByRestaurant
-);
+// orderRoutes.get(
+//   "/restaurant/:restaurantId",
+//   authMiddleware,
+//   getOrderByRestaurant
+// );
 
 // Get a specific order by ID
 orderRoutes.get("/:orderId", authMiddleware, getOrderById);

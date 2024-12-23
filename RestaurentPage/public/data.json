@@ -1,0 +1,20 @@
+[
+    {
+        "orderId": {
+            "_id": "67694f2e25ebb8c055d9fe4a",
+            "amount": 833.8,
+            "paymentMethod": "Online",
+            "createdAt": "2024-12-23T11:53:18.282Z"
+        },
+        "items": [
+            {
+                "itemId": null,
+                "name": "Beans",
+                "price": 445,
+                "quantity": 1,
+                "_id": "67694f2e25ebb8c055d9fe4d"
+            }
+        ],
+        "_id": "67694f2e25ebb8c055d9fe4c"
+    }
+]

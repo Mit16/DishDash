@@ -1,11 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { axiosInstance } from "./axiosConfig";
-import { RestaurentContext } from "./RestaurentContext";
 import { toast } from "react-toastify";
+
 export const MenuContext = createContext(null);
 
 const MenuContextProvider = (props) => {
-  const { restaurentId } = useContext(RestaurentContext);
   const [menuItems, setMenuItems] = useState([]);
 
   // Get all menu items
@@ -28,16 +27,6 @@ const MenuContextProvider = (props) => {
       } else {
         console.log("Menu Item not set");
       }
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || error.message;
-    }
-  };
-
-  // Get a specific menu item by ID
-  const getMenuItemById = async (menuItemId) => {
-    try {
-      const response = await axiosInstance.get(`/menu/item/${menuItemId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;
@@ -115,7 +104,6 @@ const MenuContextProvider = (props) => {
     toggleAvailability,
     getAllMenuItems,
     getMenuItemsByRestaurant,
-    getMenuItemById,
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,

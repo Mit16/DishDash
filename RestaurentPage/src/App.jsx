@@ -7,6 +7,7 @@ import CompleteProfile from "./components/CompleteProfile/CompleteProfile";
 import RestaurantDetails from "./pages/RestaurantDetails/RestaurantDetails";
 import Navbar from "./Components/Navbar/Navbar";
 import AddMenu from "./pages/AddMenu/AddMenu";
+import RestaurantOrders from "./pages/RestaurantOrders/RestaurantOrders";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/update-profile" element={<CompleteProfile />} />
         <Route path="/profile" element={<RestaurantDetails />} />
         <Route path="/add" element={<AddMenu />} />
+        <Route path="/restaurant-orders" element={<RestaurantOrders />} />
       </Routes>
     </div>
   );

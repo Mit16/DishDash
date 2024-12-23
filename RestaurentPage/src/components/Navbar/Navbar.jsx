@@ -29,6 +29,9 @@ const Navbar = () => {
               <Link to="/order-status">
                 <button className="navbar-btn">Order Status</button>
               </Link>
+              <Link to="/restaurant-orders" className="navbar-btn">
+                Orders
+              </Link>
               <Link to="/manage-food-items">
                 <button className="navbar-btn">Manage Food Items</button>
               </Link>

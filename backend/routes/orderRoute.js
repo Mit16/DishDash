@@ -4,7 +4,7 @@ import {
   placeOrder,
   userOrders,
   listOrders,
-  updateStatus,
+  updateOrderStatus,
   assignOrder,
   getOrderByRestaurant,
 } from "../controllers/orderController.js";
@@ -15,13 +15,9 @@ const orderRouter = express.Router();
 orderRouter.post("/place", authMiddleware, validateOrder, placeOrder);
 orderRouter.post("/userorders", authMiddleware, userOrders);
 orderRouter.get("/list", listOrders);
-orderRouter.post("/status", updateStatus);
+orderRouter.post("/status", authMiddleware, updateOrderStatus);
 orderRouter.post("/assignorder", authMiddleware, assignOrder);
 // Get orders for a specific restaurant
-orderRouter.get(
-  "/restaurant/:restaurantId",
-  authMiddleware,
-  getOrderByRestaurant
-);
+orderRouter.get("/restaurant-orders", authMiddleware, getOrderByRestaurant);
 
 export default orderRouter;

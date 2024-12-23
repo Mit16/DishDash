@@ -7,17 +7,12 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    // restaurantId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Restaurant",
-    //   required: true,
-    // },
     items: { type: Array, required: true },
     orderDate: { type: Date, default: Date.now },
     amount: { type: Number, required: true },
     deliveryAmount: { type: Number, required: true },
     address: { type: Object, required: true },
-    orderStatus: { type: String, default: "Food Processing" },
+    orderStatus: { type: String, default: "Ordered" },
     payment: { type: Boolean, default: false },
     paymentMethod: { type: String, required: true },
     deliveryPartnerId: {

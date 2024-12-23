@@ -69,19 +69,7 @@ const getOrdersByCustomer = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get orders for a specific restaurant
-const getOrderByRestaurant = async (req, res) => {
-  try {
-    const { restaurantId } = req.params;
-    const orders = await orderModel
-      .find({ restaurantId })
-      .populate("customerId", "name email")
-      .populate("dishes.dishId", "name price");
-    res.status(200).json({ data: orders });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
 // Get a specific order by ID
 const getOrderById = async (req, res) => {
   try {
@@ -141,7 +129,7 @@ export {
   createOrder,
   getAllOrders,
   getOrdersByCustomer,
-  getOrderByRestaurant,
+  // getOrderByRestaurant,
   getOrderById,
   updateOrderStatus,
   deleteOrder,

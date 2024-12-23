@@ -174,7 +174,7 @@ const listOrders = async (req, res) => {
 };
 
 //api for updating order status
-const updateStatus = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, orderStatus } = req.body;
 
@@ -201,14 +201,25 @@ const updateStatus = async (req, res) => {
 // Get orders for a specific restaurant
 const getOrderByRestaurant = async (req, res) => {
   try {
-    const { restaurantId } = req.params;
-    const orders = await orderModel
-      .find({ restaurantId })
-      .populate("customerId", "name email")
-      .populate("dishes.dishId", "name price");
-    res.status(200).json({ data: orders });
+    const restaurantId = req.user?._id; // Assuming restaurant ID comes from authenticated user
+
+    if (!restaurantId) {
+      return res.status(400).json({ message: "Restaurant ID is required" });
+    }
+
+    const restaurant = await restaurentModel
+      .findById(restaurantId, "ordersAssigned")
+      .populate("ordersAssigned.orderId", "paymentMethod createdAt")
+      .populate("ordersAssigned.items.itemId", "name price");
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json({ success: true, data: restaurant.ordersAssigned });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error fetching restaurant orders:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -216,7 +227,7 @@ export {
   placeOrder,
   userOrders,
   listOrders,
-  updateStatus,
+  updateOrderStatus,
   assignOrder,
   getOrderByRestaurant,
 };
