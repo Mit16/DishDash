@@ -24,49 +24,95 @@ const RestaurantOrders = () => {
     fetchOrders();
   }, []);
 
+  const handleAccept = async (orderId) => {
+    try {
+      await updateOrderStatus(orderId, "processing");
+      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReject = async (orderId) => {
+    try {
+      await updateOrderStatus(orderId, "cancelled by restaurant");
+      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const renderTimer = (createdAt) => {
+    const timeLeft = Math.max(
+      0,
+      15 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime())
+    );
+    const minutes = Math.floor(timeLeft / 60000);
+    const seconds = Math.floor((timeLeft % 60000) / 1000);
+
+    return `${minutes}m ${seconds}s`;
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => {
+          const timeLeft = Date.now() - new Date(order.createdAt).getTime();
+          if (timeLeft >= 15 * 60 * 1000) {
+            handleReject(order._id); // Auto-reject after 15 minutes
+            return false;
+          }
+          return true;
+        })
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [orders]);
+
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>Error: {error}</p>;
-
-  console.log("RestaurentOrders 30 : ", orders);
 
   return (
     <div className="restaurant-orders">
       <h2>Assigned Orders</h2>
-      {orders.length > 0 ? (
-        orders.map((order) => {
-          // Calculate the total price of items in the order
-          const totalPrice = order.items.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-          );
+      {orders.map((order) => {
+        if (!order._id) {
+          console.warn(`Missing orderId for order: ${order._id}`);
+          return null; // Skip rendering if _id is missing
+        }
 
-          return (
-            <div key={order._id} className="order-card">
-              <h3>Order ID: {order.orderId._id}</h3> {/* Use orderId._id */}
-              <p>
-                <strong>Payment Method:</strong> {order.orderId.paymentMethod}
-              </p>
-              <p>
-                <strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}
-              </p>
-              <p>
-                <strong>Ordered At:</strong>{" "}
-                {new Date(order.orderId.createdAt).toLocaleString()}
-              </p>
-              <h4>Items:</h4>
-              <ul>
-                {order.items.map((item) => (
-                  <li key={item._id}>
-                    {item.name} - ₹{item.price} x {item.quantity}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })
-      ) : (
-        <p>No orders assigned yet.</p>
-      )}
+        const totalPrice = order.items.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        return (
+          <div key={order._id} className="order-card">
+            <h3>Order ID: {order._id}</h3>
+            <p>
+              <strong>Timer:</strong> {renderTimer(order.createdAt)}
+            </p>
+            <p>
+              <strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}
+            </p>
+            <p>
+              <strong>Ordered At:</strong>{" "}
+              {new Date(order.createdAt).toLocaleString()}
+            </p>
+            <h4>Items:</h4>
+            <ul>
+              {order.items.map((item) => (
+                <li key={item.itemId}>
+                  {item.name} - ₹{item.price} x {item.quantity}
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => handleAccept(order._id)}>Accept</button>
+            <button onClick={() => handleReject(order._id)}>Reject</button>
+          </div>
+        );
+      })}
     </div>
   );
 };

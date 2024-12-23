@@ -85,12 +85,23 @@ const OrderContextProvider = (props) => {
     }
   };
 
+  const getProcessingOrders = async () => {
+    try {
+      const response = await axiosInstance.get("/processing");
+      return response.data; // The API should return only orders with status "processing"
+    } catch (error) {
+      console.error("Error fetching processing orders:", error);
+      throw new Error("An error occurred while fetching processing orders.");
+    }
+  };
+
   const OrderContextValue = {
     getOrdersByCustomer,
     getOrdersByRestaurant,
     updateOrderStatus,
     deleteOrder,
     assignedOrders,
+    getProcessingOrders,
   };
 
   return (
