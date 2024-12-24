@@ -212,7 +212,7 @@ const getOrderByRestaurant = async (req, res) => {
 
     const restaurant = await restaurentModel
       .findById(restaurantId, "ordersAssigned")
-      .populate("ordersAssigned.orderId", "paymentMethod createdAt")
+      .populate("ordersAssigned.orderId", "paymentMethod orderStatus createdAt")
       .populate("ordersAssigned.items.itemId", "name price");
 
     if (!restaurant) {

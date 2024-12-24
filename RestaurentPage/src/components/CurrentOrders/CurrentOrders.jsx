@@ -33,19 +33,21 @@ const CurrentOrders = () => {
     }
   };
 
-  const renderTimer = (createdAt) => {
-    const timeLeft = Math.max(
-      0,
-      30 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime())
-    );
-    const minutes = Math.floor(timeLeft / 60000);
-    const seconds = Math.floor((timeLeft % 60000) / 1000);
+  // const renderTimer = (createdAt) => {
+  //   const timeLeft = Math.max(
+  //     0,
+  //     30 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime())
+  //   );
+  //   const minutes = Math.floor(timeLeft / 60000);
+  //   const seconds = Math.floor((timeLeft % 60000) / 1000);
 
-    return `${minutes}m ${seconds}s`;
-  };
+  //   return `${minutes}m ${seconds}s`;
+  // };
 
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>Error: {error}</p>;
+
+  console.log("CurrentOrders : 50 ", orders);
 
   return (
     <div className="current-orders">
@@ -54,11 +56,35 @@ const CurrentOrders = () => {
         orders.map((order) => (
           <div key={order._id} className="order-card">
             <h3>Order ID: {order._id}</h3>
-            <p>
+            {/* <p>
               <strong>Timer:</strong> {renderTimer(order.createdAt)}
+            </p> */}
+            <p>
+              <strong>Items:</strong>
+              <ul>
+                {order.items.map((item) => (
+                  <li key={item.itemId}>
+                    {item.name} - Quantity: {item.quantity}
+                  </li>
+                ))}
+              </ul>
             </p>
             <p>
-              <strong>Total Price:</strong> ₹{order.amount.toFixed(2)}
+              <strong>Total Price:</strong> ₹
+              {order.amount.toFixed(2)}
+            </p>
+            <p>
+              <strong>Delivery Charge:</strong> ₹
+              {order.deliveryAmount.toFixed(2)}
+            </p>
+            <p>
+              <strong>Payment Status:</strong> {order.payment ? "Paid" : "Not Paid"}
+            </p>
+            <p>
+              <strong>Payment Method:</strong> {order.paymentMethod}
+            </p>
+            <p>
+              <strong>Delivery Address:</strong> {`${order.address.street}, ${order.address.city}, ${order.address.district}, ${order.address.state}, ${order.address.zipcode}`}
             </p>
             <button onClick={() => handleFoodPrepared(order._id)}>
               Food Prepared
