@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import "./OrderHistory.css";
 import { OrderContext } from "../../context/OrderContext";
-import "./RestaurantOrders.css";
 
-const RestaurantOrders = () => {
-  const { getOrdersByRestaurant, updateOrderStatus } = useContext(OrderContext);
+const OrderHistory = () => {
+  const { getOrdersByRestaurant } = useContext(OrderContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,8 +14,6 @@ const RestaurantOrders = () => {
       try {
         setLoading(true);
         const data = await getOrdersByRestaurant(); // Fetch data
-        // Filter out orders with orderStatus "processing"
-
         setOrders(data.data || []); // Store locally
       } catch (error) {
         setError(error.message);
@@ -27,28 +25,6 @@ const RestaurantOrders = () => {
     fetchOrders();
   }, []); // Dependency ensures fetchOrders is tied to getOrdersByRestaurant
 
-  const handleAccept = async (orderId) => {
-    try {
-      await updateOrderStatus(orderId, "processing");
-      setOrders((prev) =>
-        prev.filter((order) => getOrderId(order) !== orderId)
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleReject = async (orderId) => {
-    try {
-      await updateOrderStatus(orderId, "cancelled by restaurant");
-      setOrders((prev) =>
-        prev.filter((order) => getOrderId(order) !== orderId)
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const getOrderId = (order) => {
     return order.orderId?._id || order._id;
   };
@@ -56,11 +32,11 @@ const RestaurantOrders = () => {
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  console.log("RestaurantOrders 57:", orders);
+  console.log("Orderhistory 61:", orders);
 
   return (
     <div className="restaurant-orders">
-      <h2>Assigned Orders</h2>
+      <h2>Orders History</h2>
       {orders.length > 0 ? (
         orders.map((order) => {
           const orderId = getOrderId(order);
@@ -82,9 +58,6 @@ const RestaurantOrders = () => {
                 {order.orderId?.orderStatus || "Not available"}
               </p>
               <p>
-                <strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}
-              </p>
-              <p>
                 <strong>Ordered At:</strong>{" "}
                 {new Date(
                   order.orderId?.createdAt || Date.now()
@@ -98,8 +71,6 @@ const RestaurantOrders = () => {
                   </li>
                 ))}
               </ul>
-              <button onClick={() => handleAccept(orderId)}>Accept</button>
-              <button onClick={() => handleReject(orderId)}>Reject</button>
             </div>
           );
         })
@@ -110,4 +81,4 @@ const RestaurantOrders = () => {
   );
 };
 
-export default RestaurantOrders;
+export default OrderHistory;

@@ -72,3 +72,17 @@
 .remove-dish-btn:hover {
   background-color: #d32f2f;
 }
+
+.add-food-link {
+  display: inline-block;
+  margin: 20px;
+  padding: 10px 15px;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.add-food-link:hover {
+  background-color: #45a049;
+}

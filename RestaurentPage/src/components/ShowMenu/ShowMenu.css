@@ -3,19 +3,6 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.add-food-link {
-  display: inline-block;
-  margin: 20px;
-  padding: 10px 15px;
-  background-color: #4caf50;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-}
-
-.add-food-link:hover {
-  background-color: #45a049;
-}
 
 /* Menu card styling */
 .menu-container {

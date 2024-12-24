@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./ManageFoodItems.css";
 import { useNavigate } from "react-router-dom";
+import ShowMenu from "../../components/ShowMenu/ShowMenu";
 
 const ManageFoodItems = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const ManageFoodItems = () => {
       <br />
       <div className="food-list">
         <h3>Food Items List</h3>
-        <ul></ul>
+        <ShowMenu />
       </div>
     </div>
   );

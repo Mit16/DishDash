@@ -17,7 +17,8 @@ const orderSchema = new mongoose.Schema(
       enum: [
         "ordered",
         "processing",
-        "waiting for assigning to delivery boy",
+        "waiting for delivery boy",
+        "picked up by delivery boy",
         "cancelled by restaurant",
       ],
       default: "ordered",

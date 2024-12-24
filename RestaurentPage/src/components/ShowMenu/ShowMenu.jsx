@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+
 import { MenuContext } from "../../context/MenuContext";
 import "./ShowMenu.css";
 
@@ -10,9 +10,6 @@ const ShowMenu = () => {
   if (menuItems.length === 0) {
     return (
       <>
-        <Link to="/add" className="add-food-link">
-          Add Food Item
-        </Link>
         <p>
           Empty food list
           <br />
@@ -24,9 +21,6 @@ const ShowMenu = () => {
 
   return (
     <>
-      <Link to="/add" className="add-food-link">
-        Add Food Item
-      </Link>
       <div className="menu-container">
         {menuItems.map((menu) =>
           menu.dishes.map((dish) => (

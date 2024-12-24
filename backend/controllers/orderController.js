@@ -240,6 +240,38 @@ const getProcessingOrders = async (req, res) => {
   }
 };
 
+
+
+const getWaitingForDeliveryOrders = async (req, res) => {
+  try {
+    // Find orders with orderStatus "waiting for delivery boy"
+    const processingOrders = await orderModel
+      .find({ orderStatus: "waiting for delivery boy" })
+      .populate({
+        path: "deliveryPartnerId", // Populate deliveryPartnerId field
+        select: "fullname phoneNumber", // Select only fullname and phoneNumber
+      });
+
+    // Transform the populated deliveryPartnerId to include necessary details
+    const formattedOrders = processingOrders.map((order) => ({
+      ...order._doc,
+      deliveryPartner: {
+        fullname: order.deliveryPartnerId?.fullname || null,
+        phoneNumber: order.deliveryPartnerId?.phoneNumber || null,
+      },
+    }));
+
+    res.status(200).json({ success: true, data: formattedOrders });
+  } catch (error) {
+    console.error("Error fetching waiting for delivery orders:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders.",
+    });
+  }
+};
+
+
 export {
   placeOrder,
   userOrders,
@@ -248,4 +280,6 @@ export {
   assignOrder,
   getOrderByRestaurant,
   getProcessingOrders,
+
+  getWaitingForDeliveryOrders,
 };

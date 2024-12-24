@@ -8,6 +8,7 @@ import RestaurantDetails from "./pages/RestaurantDetails/RestaurantDetails";
 import Navbar from "./Components/Navbar/Navbar";
 import AddMenu from "./pages/AddMenu/AddMenu";
 import RestaurantOrders from "./pages/RestaurantOrders/RestaurantOrders";
+import OrderHistory from "./pages/OrderHistory/OrderHistory";
 
 const App = () => {
   return (
@@ -17,12 +18,13 @@ const App = () => {
         <Route path="/" element={<Login />} />
 
         <Route path="/home" element={<HomePage />} />
-     
+
         <Route path="/manage-food-items" element={<ManageFoodItems />} />
         <Route path="/update-profile" element={<CompleteProfile />} />
         <Route path="/profile" element={<RestaurantDetails />} />
         <Route path="/add" element={<AddMenu />} />
         <Route path="/restaurant-orders" element={<RestaurantOrders />} />
+        <Route path="/completedorders" element={<OrderHistory />} />
       </Routes>
     </div>
   );

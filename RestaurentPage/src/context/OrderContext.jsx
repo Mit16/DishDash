@@ -18,20 +18,6 @@ const OrderContextProvider = (props) => {
   //   }
   // };
 
-  // Get orders for a specific customer
-  const getOrdersByCustomer = async (customerId) => {
-    try {
-      const response = await axiosInstance.get(
-        `/orders/customer/${customerId}`
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch customer orders"
-      );
-    }
-  };
-
   // Get orders for a specific restaurant
   const getOrdersByRestaurant = useCallback(async () => {
     try {
@@ -95,15 +81,34 @@ const OrderContextProvider = (props) => {
       throw new Error("An error occurred while fetching processing orders.");
     }
   };
+  const getOrderedOrders = async () => {
+    try {
+      const response = await axiosInstance.get("api/orders/orderedorders");
+      return response.data; // The API should return only orders with status "processing"
+    } catch (error) {
+      console.error("Error fetching processing orders:", error);
+      throw new Error("An error occurred while fetching processing orders.");
+    }
+  };
+  const getwaitingForDeliveryOrders = async () => {
+    try {
+      const response = await axiosInstance.get("api/orders/preparedorders");
+      return response.data; // The API should return only orders with status "processing"
+    } catch (error) {
+      console.error("Error fetching processing orders:", error);
+      throw new Error("An error occurred while fetching processing orders.");
+    }
+  };
 
   const OrderContextValue = useMemo(
     () => ({
-      getOrdersByCustomer,
+      getOrderedOrders,
       getOrdersByRestaurant,
       updateOrderStatus,
       deleteOrder,
       assignedOrders,
       getProcessingOrders,
+      getwaitingForDeliveryOrders,
     }),
     [assignedOrders]
   );

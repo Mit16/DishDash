@@ -26,7 +26,7 @@ const CurrentOrders = () => {
 
   const handleFoodPrepared = async (orderId) => {
     try {
-      await updateOrderStatus(orderId, "waiting for assigning to delivery boy");
+      await updateOrderStatus(orderId, "waiting for delivery boy");
       setOrders((prev) => prev.filter((order) => order._id !== orderId)); // Remove processed orders
     } catch (err) {
       console.error(err);
@@ -70,21 +70,22 @@ const CurrentOrders = () => {
               </ul>
             </p>
             <p>
-              <strong>Total Price:</strong> ₹
-              {order.amount.toFixed(2)}
+              <strong>Total Price:</strong> ₹{order.amount.toFixed(2)}
             </p>
             <p>
               <strong>Delivery Charge:</strong> ₹
               {order.deliveryAmount.toFixed(2)}
             </p>
             <p>
-              <strong>Payment Status:</strong> {order.payment ? "Paid" : "Not Paid"}
+              <strong>Payment Status:</strong>{" "}
+              {order.payment ? "Paid" : "Not Paid"}
             </p>
             <p>
               <strong>Payment Method:</strong> {order.paymentMethod}
             </p>
             <p>
-              <strong>Delivery Address:</strong> {`${order.address.street}, ${order.address.city}, ${order.address.district}, ${order.address.state}, ${order.address.zipcode}`}
+              <strong>Delivery Address:</strong>{" "}
+              {`${order.address.street}, ${order.address.city}, ${order.address.district}, ${order.address.state}, ${order.address.zipcode}`}
             </p>
             <button onClick={() => handleFoodPrepared(order._id)}>
               Food Prepared

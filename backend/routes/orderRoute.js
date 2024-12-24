@@ -8,6 +8,7 @@ import {
   assignOrder,
   getOrderByRestaurant,
   getProcessingOrders,
+  getWaitingForDeliveryOrders,
 } from "../controllers/orderController.js";
 import validateOrder from "../validators/orderValidator.js";
 
@@ -21,4 +22,7 @@ orderRouter.post("/assignorder", authMiddleware, assignOrder);
 // Get orders for a specific restaurant
 orderRouter.get("/restaurant-orders", authMiddleware, getOrderByRestaurant);
 orderRouter.get("/processing", authMiddleware, getProcessingOrders);
+
+orderRouter.get("/preparedorders", authMiddleware, getWaitingForDeliveryOrders);
+
 export default orderRouter;
