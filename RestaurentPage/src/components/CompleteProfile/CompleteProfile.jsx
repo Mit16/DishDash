@@ -8,7 +8,6 @@ const CompleteProfile = () => {
   const {
     updateRestaurant,
     updateDetails,
-    fetchRestaurantById,
     toggleRestaurantProfileStatus,
     setUpdateDetails,
     restaurantDetails,
@@ -111,14 +110,19 @@ const CompleteProfile = () => {
 
   return (
     <form onSubmit={handleSubmit} className="profile-container">
-      <input
-        type="text"
-        name="restaurentName"
-        placeholder="Restaurent Name"
-        value={profileData.restaurentName || "N/A"}
-        onChange={handleChange}
-        required
-      />
+      {updateDetails ? (
+        <></>
+      ) : (
+        <input
+          type="text"
+          name="restaurentName"
+          placeholder="Restaurent Name"
+          value={profileData.restaurentName || "N/A"}
+          onChange={handleChange}
+          required
+        />
+      )}
+
       <input
         type="text"
         name="phone"

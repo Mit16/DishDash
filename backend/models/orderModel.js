@@ -29,17 +29,11 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "deliveryusers",
     },
-    // expiresAt: {
-    //   type: Date,
-    //   required: true,
-    //   default: () => Date.now() + 15 * 60 * 1000, // 15 mins from creation
-    // },
   },
   { minimize: false, timestamps: true }
 );
 
-// Create TTL index
-// orderSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
 
 const orderModel =
   mongoose.models.order || mongoose.model("order", orderSchema);

@@ -228,38 +228,102 @@ const getOrderByRestaurant = async (req, res) => {
 
 const getProcessingOrders = async (req, res) => {
   try {
-    const processingOrders = await orderModel.find({
-      orderStatus: "processing",
-    });
+    const restaurantId = req.user?._id; // Assuming restaurant ID comes from authenticated user
+
+    if (!restaurantId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Restaurant ID is required" });
+    }
+
+    // Fetch orders assigned to the restaurant where the status is "processing"
+    const restaurant = await restaurentModel
+      .findById(restaurantId, "ordersAssigned")
+      .populate({
+        path: "ordersAssigned.orderId",
+        match: { orderStatus: "processing" }, // Filter only "processing" orders
+        select:
+          "userId items amount payment paymentMethod orderStatus createdAt",
+      })
+      .populate("ordersAssigned.items.itemId", "name price"); // Include item details
+
+    if (!restaurant || !restaurant.ordersAssigned.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found for this restaurant.",
+      });
+    }
+
+    const processingOrders = restaurant.ordersAssigned.filter(
+      (order) => order.orderId && order.orderId.orderStatus === "processing"
+    );
+
     res.status(200).json({ success: true, data: processingOrders });
   } catch (error) {
     console.error("Error fetching processing orders:", error);
     res
       .status(500)
-      .json({ success: false, message: "Failed to fetch orders." });
+      .json({ success: false, message: "Failed to fetch processing orders." });
   }
 };
 
-
-
 const getWaitingForDeliveryOrders = async (req, res) => {
   try {
-    // Find orders with orderStatus "waiting for delivery boy"
-    const processingOrders = await orderModel
-      .find({ orderStatus: "waiting for delivery boy" })
+    const restaurantId = req.user?._id; // Assuming restaurant ID comes from authenticated user
+
+    if (!restaurantId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Restaurant ID is required" });
+    }
+
+    // Fetch orders assigned to the restaurant
+    const restaurant = await restaurentModel
+      .findById(restaurantId, "ordersAssigned")
       .populate({
-        path: "deliveryPartnerId", // Populate deliveryPartnerId field
-        select: "fullname phoneNumber", // Select only fullname and phoneNumber
+        path: "ordersAssigned.orderId",
+        match: { orderStatus: "waiting for delivery boy" }, // Filter orders
+        populate: {
+          path: "deliveryPartnerId", // Populate delivery partner details
+          select: "fullname phoneNumber",
+        },
+        select: "items orderStatus",
+      })
+      .populate({
+        path: "ordersAssigned.items.itemId", // Populate items
+        model: "Menu", // Ensure the model is explicitly defined
+        select: "name", // Select only the 'name' field from the Menu schema
       });
 
-    // Transform the populated deliveryPartnerId to include necessary details
-    const formattedOrders = processingOrders.map((order) => ({
-      ...order._doc,
-      deliveryPartner: {
-        fullname: order.deliveryPartnerId?.fullname || null,
-        phoneNumber: order.deliveryPartnerId?.phoneNumber || null,
-      },
-    }));
+    if (!restaurant || !restaurant.ordersAssigned.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found for this restaurant.",
+      });
+    }
+
+    // Filter and format the data
+    const formattedOrders = restaurant.ordersAssigned
+      .filter(
+        (order) =>
+          order.orderId &&
+          order.orderId.orderStatus === "waiting for delivery boy"
+      )
+      .map((order) => ({
+        orderId: order.orderId._id,
+        items: order.items.map((item) => ({
+          name: item.itemId?.name || "Unknown Item", // Default to "Unknown Item" if undefined
+          quantity: item.quantity || 1,
+        })),
+        deliveryPartner: {
+          fullname:
+            `${order.orderId.deliveryPartnerId?.fullname.firstname || ""} ${
+              order.orderId.deliveryPartnerId?.fullname.lastname || ""
+            }`.trim() || "Not Assigned",
+          phoneNumber:
+            order.orderId.deliveryPartnerId?.phoneNumber || "Not Assigned",
+        },
+      }));
 
     res.status(200).json({ success: true, data: formattedOrders });
   } catch (error) {
@@ -271,7 +335,6 @@ const getWaitingForDeliveryOrders = async (req, res) => {
   }
 };
 
-
 export {
   placeOrder,
   userOrders,
@@ -280,6 +343,5 @@ export {
   assignOrder,
   getOrderByRestaurant,
   getProcessingOrders,
-
   getWaitingForDeliveryOrders,
 };

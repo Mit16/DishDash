@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import "./Preparedorder.css";
+import "./PreparedOrder.css";
 import { OrderContext } from "../../context/OrderContext";
 
 const PreparedOrder = () => {
@@ -13,8 +13,8 @@ const PreparedOrder = () => {
     const fetchPreparedOrders = async () => {
       try {
         setLoading(true);
-        const data = await getwaitingForDeliveryOrders(); // Fetch data
-        setPreparedOrders(data.data || []); // Store locally
+        const data = await getwaitingForDeliveryOrders();
+        setPreparedOrders(data.data || []);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -29,8 +29,8 @@ const PreparedOrder = () => {
     try {
       await updateOrderStatus(orderId, "picked up by delivery boy");
       setPreparedOrders((prev) =>
-        prev.filter((order) => order._id !== orderId)
-      ); // Remove processed orders
+        prev.filter((order) => order.orderId !== orderId)
+      );
     } catch (err) {
       console.error(err);
     }
@@ -39,34 +39,24 @@ const PreparedOrder = () => {
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  console.log("Prepared Orders 42 : ", preparedOrders);
+
   return (
     <div className="prepared-orders">
       <h2>Prepared Orders</h2>
       {preparedOrders.length > 0 ? (
         preparedOrders.map((order) => {
-          const { _id, items, amount, address, deliveryPartner, orderDate } =
-            order;
-
-          const formattedDate = new Date(orderDate).toLocaleString();
+          const { orderId, items, deliveryPartner } = order;
 
           return (
-            <div key={_id} className="order-card">
-              <h3>Order ID: {_id}</h3>
-              <p>
-                <strong>Total Amount:</strong> ₹{amount.toFixed(2)}
-              </p>
-              <p>
-                <strong>Order Date:</strong> {formattedDate}
-              </p>
-              <p>
-                <strong>Delivery Address:</strong>{" "}
-                {`${address.street}, ${address.city}, ${address.state} - ${address.zipcode}`}
-              </p>
+            <div key={orderId} className="order-card">
+              <h3>Order ID: {orderId}</h3>
+
               <h4>Items:</h4>
               <ul>
                 {items.map((item, index) => (
-                  <li key={item._id || index}>
-                    {item.name} - ₹{item.price} x {item.quantity}
+                  <li key={index}>
+                    {item.name || "Unknown Item"} - Quantity: {item.quantity}
                   </li>
                 ))}
               </ul>
@@ -75,18 +65,19 @@ const PreparedOrder = () => {
               {deliveryPartner ? (
                 <p>
                   <strong>Name:</strong>{" "}
-                  {`${deliveryPartner.fullname.firstname} ${deliveryPartner.fullname.lastname}`}{" "}
+                  {deliveryPartner.fullname || "Not Assigned"}
                   <br />
                   <strong>Phone:</strong> {deliveryPartner.phoneNumber}
                 </p>
               ) : (
                 <p>No delivery boy assigned yet.</p>
               )}
+
               <button
                 className="pickup-button"
-                onClick={() => handlePreparedOrder(_id)}
+                onClick={() => handlePreparedOrder(orderId)}
               >
-                Picked up by delivery boy
+                Mark as Picked Up
               </button>
             </div>
           );

@@ -1,44 +1,95 @@
+/* General styling for the form container */
 .login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: tomato;
+  max-width: 400px;
+  margin: 5% auto;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Form input fields styling */
+.signin-popup-inputs input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* Styling for checkbox container */
+.signin-popup-condition {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.signin-popup-condition p {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Styling for the buttons */
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Styling for the text with links */
+p {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #555;
+}
+
+.cursor-pointer {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  text-decoration: underline;
+}
+
+/* Highlight for the font */
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Add responsiveness */
+@media screen and (max-width: 480px) {
+  .login-container {
+    width: 90%;
+    padding: 15px;
   }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+
+  .signin-popup-inputs input {
+    font-size: 14px;
   }
-  
-  input {
-    padding: 10px;
-    border: 1px solid white;
-    border-radius: 5px;
-    width: 250px;
-  }
-  
-  button {
-    background-color: white;
-    color: tomato;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
+
   .register-btn {
-    margin-top: 10px;
-    background: none;
-    border: none;
-    color: white;
-    text-decoration: underline;
-    cursor: pointer;
+    font-size: 14px;
+    padding: 10px;
   }
-  
-  .register-btn:hover {
-    color: #ffd1c1;
+
+  p {
+    font-size: 13px;
   }
-  
+}

@@ -27,73 +27,60 @@ const CurrentOrders = () => {
   const handleFoodPrepared = async (orderId) => {
     try {
       await updateOrderStatus(orderId, "waiting for delivery boy");
-      setOrders((prev) => prev.filter((order) => order._id !== orderId)); // Remove processed orders
+      setOrders((prev) => prev.filter((order) => order.orderId !== orderId));
     } catch (err) {
       console.error(err);
     }
   };
 
-  // const renderTimer = (createdAt) => {
-  //   const timeLeft = Math.max(
-  //     0,
-  //     30 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime())
-  //   );
-  //   const minutes = Math.floor(timeLeft / 60000);
-  //   const seconds = Math.floor((timeLeft % 60000) / 1000);
-
-  //   return `${minutes}m ${seconds}s`;
-  // };
-
-  if (loading) return <p>Loading orders...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  console.log("CurrentOrders : 50 ", orders);
+  if (loading) return <p className="loading">Loading orders...</p>;
+  if (error) return <p className="error">Error: {error}</p>;
 
   return (
     <div className="current-orders">
       <h2>Current Orders</h2>
       {orders.length > 0 ? (
-        orders.map((order) => (
-          <div key={order._id} className="order-card">
-            <h3>Order ID: {order._id}</h3>
-            {/* <p>
-              <strong>Timer:</strong> {renderTimer(order.createdAt)}
-            </p> */}
-            <p>
-              <strong>Items:</strong>
+        orders.map((order) => {
+          const { orderId, items, amount, payment, paymentMethod, createdAt } =
+            order.orderId;
+
+          const formattedDate = new Date(createdAt).toLocaleString();
+
+          return (
+            <div key={orderId} className="order-card">
+              <h3>Order ID: {orderId}</h3>
+              <p>
+                <strong>Order Date:</strong> {formattedDate}
+              </p>
+              <h4>Items:</h4>
               <ul>
-                {order.items.map((item) => (
-                  <li key={item.itemId}>
-                    {item.name} - Quantity: {item.quantity}
+                {items.map((item, index) => (
+                  <li key={`${orderId}-${item.itemId || index}`}>
+                    {item.name} - ₹{item.price} x {item.quantity}
                   </li>
                 ))}
               </ul>
-            </p>
-            <p>
-              <strong>Total Price:</strong> ₹{order.amount.toFixed(2)}
-            </p>
-            <p>
-              <strong>Delivery Charge:</strong> ₹
-              {order.deliveryAmount.toFixed(2)}
-            </p>
-            <p>
-              <strong>Payment Status:</strong>{" "}
-              {order.payment ? "Paid" : "Not Paid"}
-            </p>
-            <p>
-              <strong>Payment Method:</strong> {order.paymentMethod}
-            </p>
-            <p>
-              <strong>Delivery Address:</strong>{" "}
-              {`${order.address.street}, ${order.address.city}, ${order.address.district}, ${order.address.state}, ${order.address.zipcode}`}
-            </p>
-            <button onClick={() => handleFoodPrepared(order._id)}>
-              Food Prepared
-            </button>
-          </div>
-        ))
+              <p>
+                <strong>Total Price:</strong> ₹{amount.toFixed(2)}
+              </p>
+              <p>
+                <strong>Payment Status:</strong>{" "}
+                {payment ? "Paid" : "Not Paid"}
+              </p>
+              <p>
+                <strong>Payment Method:</strong> {paymentMethod}
+              </p>
+              <button
+                className="prepared-button"
+                onClick={() => handleFoodPrepared(orderId)}
+              >
+                Mark as Prepared
+              </button>
+            </div>
+          );
+        })
       ) : (
-        <p>No current orders.</p>
+        <p className="no-orders">No current orders.</p>
       )}
     </div>
   );
