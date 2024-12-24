@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import "./ManageFoodItems.css";
 import { useNavigate } from "react-router-dom";
 

@@ -8,12 +8,17 @@ const RestaurantOrders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch orders once when the component loads
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const data = await getOrdersByRestaurant();
-        setOrders(data.data || []);
+        const data = await getOrdersByRestaurant(); // Fetch data
+        // Filter out orders with orderStatus "processing"
+        const filteredOrders = data.data.filter(
+          (order) => order.orderId?.orderStatus !== "processing"
+        );
+        setOrders(filteredOrders); // Store locally
       } catch (error) {
         setError(error.message);
       } finally {
@@ -22,36 +27,70 @@ const RestaurantOrders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, []); // Dependency ensures fetchOrders is tied to getOrdersByRestaurant
+
+  const handleAccept = async (orderId) => {
+    try {
+      await updateOrderStatus(orderId, "processing");
+      setOrders((prev) =>
+        prev.filter((order) => getOrderId(order) !== orderId)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReject = async (orderId) => {
+    try {
+      await updateOrderStatus(orderId, "cancelled by restaurant");
+      setOrders((prev) =>
+        prev.filter((order) => getOrderId(order) !== orderId)
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getOrderId = (order) => {
+    return order.orderId?._id || order._id;
+  };
 
   if (loading) return <p>Loading orders...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  console.log("RestaurentOrders 30 : ", orders);
+  console.log("RestaurantOrders 57:", orders);
 
   return (
     <div className="restaurant-orders">
       <h2>Assigned Orders</h2>
       {orders.length > 0 ? (
         orders.map((order) => {
-          // Calculate the total price of items in the order
+          const orderId = getOrderId(order);
+          if (!orderId) {
+            console.warn(`Missing orderId for order: ${order._id}`);
+            return null; // Skip rendering if no valid ID is available
+          }
+
           const totalPrice = order.items.reduce(
             (sum, item) => sum + item.price * item.quantity,
             0
           );
 
           return (
-            <div key={order._id} className="order-card">
-              <h3>Order ID: {order.orderId._id}</h3> {/* Use orderId._id */}
+            <div key={orderId} className="order-card">
+              <h3>Order ID: {orderId}</h3>
               <p>
-                <strong>Payment Method:</strong> {order.orderId.paymentMethod}
+                <strong>Order Status:</strong>{" "}
+                {order.orderId?.orderStatus || "Not available"}
               </p>
               <p>
                 <strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}
               </p>
               <p>
                 <strong>Ordered At:</strong>{" "}
-                {new Date(order.orderId.createdAt).toLocaleString()}
+                {new Date(
+                  order.orderId?.createdAt || Date.now()
+                ).toLocaleString()}
               </p>
               <h4>Items:</h4>
               <ul>
@@ -61,6 +100,8 @@ const RestaurantOrders = () => {
                   </li>
                 ))}
               </ul>
+              <button onClick={() => handleAccept(orderId)}>Accept</button>
+              <button onClick={() => handleReject(orderId)}>Reject</button>
             </div>
           );
         })

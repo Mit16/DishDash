@@ -12,16 +12,33 @@ const orderSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     deliveryAmount: { type: Number, required: true },
     address: { type: Object, required: true },
-    orderStatus: { type: String, default: "Ordered" },
+    orderStatus: {
+      type: String,
+      enum: [
+        "ordered",
+        "processing",
+        "waiting for assigning to delivery boy",
+        "cancelled by restaurant",
+      ],
+      default: "ordered",
+    },
     payment: { type: Boolean, default: false },
     paymentMethod: { type: String, required: true },
     deliveryPartnerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "deliveryusers",
     },
+    // expiresAt: {
+    //   type: Date,
+    //   required: true,
+    //   default: () => Date.now() + 15 * 60 * 1000, // 15 mins from creation
+    // },
   },
   { minimize: false, timestamps: true }
 );
+
+// Create TTL index
+// orderSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const orderModel =
   mongoose.models.order || mongoose.model("order", orderSchema);

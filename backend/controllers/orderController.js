@@ -177,9 +177,11 @@ const listOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, orderStatus } = req.body;
+    console.log("Incoming Request: ", { orderId, orderStatus });
 
     const order = await orderModel.findById(orderId);
     if (!order) {
+      console.log("Order not found for ID: ", orderId);
       return res
         .status(404)
         .json({ success: false, message: "Order not found." });
@@ -188,6 +190,7 @@ const updateOrderStatus = async (req, res) => {
     order.orderStatus = orderStatus;
     await order.save();
 
+    console.log("Order status updated successfully for ID: ", orderId);
     res.json({ success: true, message: "Status updated successfully." });
   } catch (error) {
     console.error("Error updating order status:", error);
@@ -209,7 +212,7 @@ const getOrderByRestaurant = async (req, res) => {
 
     const restaurant = await restaurentModel
       .findById(restaurantId, "ordersAssigned")
-      .populate("ordersAssigned.orderId", "paymentMethod createdAt")
+      .populate("ordersAssigned.orderId", "paymentMethod orderStatus createdAt")
       .populate("ordersAssigned.items.itemId", "name price");
 
     if (!restaurant) {
@@ -223,6 +226,20 @@ const getOrderByRestaurant = async (req, res) => {
   }
 };
 
+const getProcessingOrders = async (req, res) => {
+  try {
+    const processingOrders = await orderModel.find({
+      orderStatus: "processing",
+    });
+    res.status(200).json({ success: true, data: processingOrders });
+  } catch (error) {
+    console.error("Error fetching processing orders:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch orders." });
+  }
+};
+
 export {
   placeOrder,
   userOrders,
@@ -230,4 +247,5 @@ export {
   updateOrderStatus,
   assignOrder,
   getOrderByRestaurant,
+  getProcessingOrders,
 };
