@@ -19,7 +19,11 @@ const orderSchema = new mongoose.Schema(
         "processing",
         "waiting for delivery boy",
         "picked up by delivery boy",
+        "Out for delivery",
+        "Delivered",
+        "Cancelled by delivery boy",
         "cancelled by restaurant",
+        "Cancelled",
       ],
       default: "ordered",
     },
@@ -32,8 +36,6 @@ const orderSchema = new mongoose.Schema(
   },
   { minimize: false, timestamps: true }
 );
-
-
 
 const orderModel =
   mongoose.models.order || mongoose.model("order", orderSchema);

@@ -49,30 +49,22 @@ const Login = () => {
     } else {
       newURL += "/api/delivery/register";
     }
-    try {
-      const response = await axios.post(newURL, data);
-      // console.log("Login Response:", response); // Debugging
-      if (response.data.success) {
-        // console.log("Login Success:", response.data);
+  try {
+  const response = await axios.post(newURL, data);
+  console.log("Response received:", response.data);
 
-        // Corrected: Accessing profileCompleted
-        // const isProfileCompleted = response.data?.profileCompleted ?? false;
+  if (response.data.success) {
+    await Signin(response.data.token);
+    setMenuItems([]);
+    navigate(secondRegister ? "/update-profile" : "/home");
+  } else {
+    alert(response.data.message || "Unexpected error occurred");
+  }
+} catch (error) {
+  console.error("Error in login:", error);
+  alert(error.response?.data?.message || "Login failed. Please try again.");
+}
 
-        // Sign in and navigate
-        await Signin(response.data.token);
-        setMenuItems([]);
-        if (!secondRegister) {
-          navigate("/home");
-        } else {
-          navigate("/update-profile");
-        }
-      } else {
-        alert(response.data.message);
-      }
-    } catch (error) {
-      console.error("Login error:", error.response?.data || error.message);
-      alert("Login failed! Please try again.");
-    }
   };
 
   return (

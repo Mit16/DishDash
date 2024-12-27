@@ -60,7 +60,7 @@ const Login = () => {
     if (!secondRegister) {
       navigate("/home");
     } else {
-      navigate("/dashboard");
+      navigate("/register");
     }
   };
 

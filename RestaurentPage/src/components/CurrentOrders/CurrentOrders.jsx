@@ -27,7 +27,7 @@ const CurrentOrders = () => {
   const handleFoodPrepared = async (orderId) => {
     try {
       await updateOrderStatus(orderId, "waiting for delivery boy");
-      setOrders((prev) => prev.filter((order) => order.orderId !== orderId));
+      setOrders((prev) => prev.filter((order) => order._id !== orderId));
     } catch (err) {
       console.error(err);
     }
@@ -36,13 +36,21 @@ const CurrentOrders = () => {
   if (loading) return <p className="loading">Loading orders...</p>;
   if (error) return <p className="error">Error: {error}</p>;
 
+  console.log("CurrentOrders 39: ", orders);
+
   return (
     <div className="current-orders">
       <h2>Current Orders</h2>
       {orders.length > 0 ? (
         orders.map((order) => {
-          const { orderId, items, amount, payment, paymentMethod, createdAt } =
-            order.orderId;
+          const {
+            _id: orderId,
+            items,
+            amount,
+            payment,
+            paymentMethod,
+            createdAt,
+          } = order;
 
           const formattedDate = new Date(createdAt).toLocaleString();
 
@@ -54,18 +62,21 @@ const CurrentOrders = () => {
               </p>
               <h4>Items:</h4>
               <ul>
-                {items.map((item, index) => (
-                  <li key={`${orderId}-${item.itemId || index}`}>
-                    {item.name} - ₹{item.price} x {item.quantity}
-                  </li>
-                ))}
+                {items.length > 0 ? (
+                  items.map((item, index) => (
+                    <li key={`${orderId}-${item.itemId || index}`}>
+                      {item.name} - ₹{item.price} x {item.quantity}
+                    </li>
+                  ))
+                ) : (
+                  <li>No items in this order.</li>
+                )}
               </ul>
               <p>
                 <strong>Total Price:</strong> ₹{amount.toFixed(2)}
               </p>
               <p>
-                <strong>Payment Status:</strong>{" "}
-                {payment ? "Paid" : "Not Paid"}
+                <strong>Payment Status:</strong> {payment ? "Paid" : "Not Paid"}
               </p>
               <p>
                 <strong>Payment Method:</strong> {paymentMethod}

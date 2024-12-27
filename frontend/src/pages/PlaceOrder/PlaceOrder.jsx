@@ -164,7 +164,8 @@ const PlaceOrder = () => {
           <div className="popup-content">
             <div className="popup-icon">✔</div>
             <p>Order Placed Successfully!</p>
-            <button className="popup-close" onClick={() => setShowPopup(false)}>
+            <button className="popup-close" onClick={() => {setShowPopup(false);
+            navigate("/myorders")}}>
               Close
             </button>
           </div>

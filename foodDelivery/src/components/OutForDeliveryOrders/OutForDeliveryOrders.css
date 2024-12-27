@@ -1,0 +1,60 @@
+.out-for-delivery-orders {
+  padding: 20px;
+}
+
+.orders-list {
+  list-style: none;
+  padding: 0;
+}
+
+.order-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.order-item h4 {
+  margin-bottom: 10px;
+}
+
+.order-item p {
+  margin: 5px 0;
+}
+
+.restaurant-info {
+  font-size: 14px;
+  color: #555;
+}
+
+.order-actions {
+  margin-top: 15px;
+}
+
+.status-btn {
+  padding: 8px 15px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delivered-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+}
+
+.status-btn:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}

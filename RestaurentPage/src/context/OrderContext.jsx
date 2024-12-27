@@ -81,6 +81,7 @@ const OrderContextProvider = (props) => {
       throw new Error("An error occurred while fetching processing orders.");
     }
   };
+  
   const getOrderedOrders = async () => {
     try {
       const response = await axiosInstance.get("api/orders/orderedorders");

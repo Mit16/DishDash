@@ -6,55 +6,51 @@ import { axiosInstance } from "./axiosConfig";
 
 export const DeliveryContext = createContext(null);
 
-const DeliveryContextProvider = ({ children }) => {
+const DeliveryContextProvider = (props) => {
   // Shared state for delivery data
   const [token, setToken] = useState(localStorage.getItem("Token") || null);
   const [assignedOrders, setAssignedOrders] = useState([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const navigate = useNavigate();
-  const [deliveredOrders, setDeliveredOrders] = useState([]); // Store delivered orders
+
   const apiURL = "http://localhost:4000";
+  const [orderHistory, setOrderHistory] = useState([]);
 
-  // Fetch earnings
-  const fetchEarnings = async () => {
+  // Fetch order history
+  const fetchOrderHistory = async () => {
     try {
-      // Fetch delivered orders
-      const deliveredResponse = await axiosInstance.get(
-        "/api/delivery/orders/delivered"
-      );
+      const response = await axiosInstance.get("/api/delivery/orders/history");
 
-      if (deliveredResponse.data.success) {
-        const orders = deliveredResponse.data.orders;
-        setDeliveredOrders(orders); // Store delivered orders locally
-
-        // Calculate total earnings
-        const earnings = orders.reduce(
-          (sum, order) => sum + order.deliveryAmount,
-          0
-        );
-
-        // Update totalEarnings in the database
-        const earningsResponse = await axiosInstance.post(
-          "/api/delivery/updateDetails",
-          { updateData: { totalEarnings: earnings } }
-        );
-
-        if (earningsResponse.data.success) {
-          setTotalEarnings(earnings); // Update local state
-          toast.success("Earnings updated successfully.");
-        } else {
-          toast.error(
-            earningsResponse.data.message || "Failed to update earnings."
-          );
-        }
+      if (response.data.success) {
+        setOrderHistory(response.data.data); // Store fetched orders in state
       } else {
-        toast.error(
-          deliveredResponse.data.message || "Failed to fetch delivered orders."
+        console.error(
+          response.data.message || "Failed to fetch order history."
         );
       }
     } catch (error) {
-      console.error("Error in fetchEarnings:", error);
-      toast.error("An error occurred while fetching earnings.");
+      console.error("Error fetching order history:", error);
+    }
+  };
+
+  // Fetch earnings
+  const fetchDeliveredOrders = async () => {
+    try {
+      const response = await axiosInstance.get(
+        "/api/delivery/orders/delivered"
+      );
+
+      if (response.data.success) {
+        return response.data.orders;
+        // Keep only the top 5 orders
+        // setDeliveredOrders(orders.slice(0, 5));
+      } else {
+        console.error(
+          response.data.message || "Failed to fetch delivered orders."
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching delivered orders:", error);
     }
   };
 
@@ -90,6 +86,25 @@ const DeliveryContextProvider = ({ children }) => {
     }
   };
 
+  const getOutForDeliveryOrders = async () => {
+    // const token = localStorage.getItem("Token"); // Retrieve token directly
+    if (!token) {
+      console.warn("No token found, cannot fetch assigned orders.");
+      return;
+    }
+    try {
+      const response = await axiosInstance.get("/api/delivery/outfordelivery");
+
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching assigned orders:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while fetching assigned orders."
+      );
+    }
+  };
+
   const updateOrderStatus = async (orderId, orderStatus) => {
     try {
       const response = await axiosInstance.post("/api/delivery/status", {
@@ -101,6 +116,58 @@ const DeliveryContextProvider = ({ children }) => {
     } catch (error) {
       console.error("Error updating order status:", error);
       throw new Error("An error occurred while updating order status.");
+    }
+  };
+
+  const fetchDeliveryGuyDetails = async () => {
+    try {
+      const response = await axiosInstance.get("/api/delivery/details");
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        console.error(response.data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching delivery guy details:", error);
+      return null;
+    }
+  };
+
+  const fetchEarnings = async () => {
+    try {
+      const response = await axiosInstance.get("/api/delivery/earnings");
+      if (response.data.success) {
+        return response.data.totalEarnings;
+      } else {
+        console.error(response.data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching earnings:", error);
+      return null;
+    }
+  };
+
+  const markOrderAsDelivered = async (orderId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/api/delivery/orders/${orderId}/delivered`
+      );
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Order marked as delivered!");
+        return true;
+      } else {
+        toast.error(
+          response.data.message || "Failed to mark order as delivered."
+        );
+        return false;
+      }
+    } catch (error) {
+      console.error("Error marking order as delivered:", error);
+      toast.error(error.response?.data?.message || "Server error.");
+      return false;
     }
   };
 
@@ -125,7 +192,7 @@ const DeliveryContextProvider = ({ children }) => {
         setToken(storedToken);
         if (token) {
           await fetchAssignedOrders();
-          await fetchEarnings();
+          await fetchDeliveredOrders();
         }
       } else {
         console.error("No token found in localStorage!");
@@ -137,18 +204,24 @@ const DeliveryContextProvider = ({ children }) => {
   const DeliveryContextValue = {
     assignedOrders,
     token,
-    setToken,
+    orderHistory,
     apiURL,
+    totalEarnings,
+    setToken,
     Signout,
     Signin,
-    totalEarnings,
+    fetchDeliveredOrders,
     updateOrderStatus,
-    deliveredOrders,
+    fetchOrderHistory,
+    getOutForDeliveryOrders,
+    fetchDeliveryGuyDetails,
+    fetchEarnings,
+    markOrderAsDelivered,
   };
 
   return (
     <DeliveryContext.Provider value={DeliveryContextValue}>
-      {children}
+      {props.children}
     </DeliveryContext.Provider>
   );
 };

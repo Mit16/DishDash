@@ -1,0 +1,83 @@
+.assigned-orders-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .orders-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .order-item {
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  
+  .order-item h4 {
+    margin: 0 0 10px;
+    color: #444;
+  }
+  
+  .order-item p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .restaurant-info {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #777;
+  }
+  
+  .order-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .status-btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .out-delivery-btn {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .out-delivery-btn:hover {
+    background-color: #218838;
+  }
+  
+  .cancel-btn {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #c82333;
+  }
+  
+  p strong {
+    color: #333;
+  }
+  

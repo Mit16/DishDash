@@ -1,54 +1,37 @@
-.order-history {
+.order-history-container {
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.order-item {
-  padding: 15px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #ffffff;
-}
-
-.order-item h4 {
-  margin: 0;
-  font-size: 18px;
+.order-history-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
   color: #333;
 }
 
-.order-item p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.restaurant-details {
-  margin-left: 10px;
-  font-style: italic;
-  color: #777;
-}
-
-ul {
+.order-history-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-li {
-  margin-bottom: 5px;
+.order-history-item {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button {
-  margin-top: 20px;
-  padding: 10px 15px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.order-history-item p {
+  margin: 5px 0;
+  font-size: 14px;
 }
 
-button:hover {
-  background-color: #0056b3;
+.order-history-item strong {
+  color: #555;
 }

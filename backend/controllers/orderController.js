@@ -233,37 +233,80 @@ const getProcessingOrders = async (req, res) => {
     if (!restaurantId) {
       return res
         .status(400)
-        .json({ success: false, message: "Restaurant ID is required" });
+        .json({ success: false, message: "Restaurant ID is required." });
     }
 
-    // Fetch orders assigned to the restaurant where the status is "processing"
+    // Fetch the restaurant and its assigned orders with populated items
     const restaurant = await restaurentModel
       .findById(restaurantId, "ordersAssigned")
       .populate({
         path: "ordersAssigned.orderId",
-        match: { orderStatus: "processing" }, // Filter only "processing" orders
-        select:
-          "userId items amount payment paymentMethod orderStatus createdAt",
-      })
-      .populate("ordersAssigned.items.itemId", "name price"); // Include item details
+        match: { orderStatus: "processing" },
+        select: "items amount paymentMethod orderStatus createdAt",
+        populate: {
+          path: "items.itemId",
+          select: "name price restaurantId",
+        },
+      });
 
-    if (!restaurant || !restaurant.ordersAssigned.length) {
+    if (!restaurant) {
       return res.status(404).json({
         success: false,
-        message: "No orders found for this restaurant.",
+        message: "Restaurant not found.",
       });
     }
 
-    const processingOrders = restaurant.ordersAssigned.filter(
-      (order) => order.orderId && order.orderId.orderStatus === "processing"
-    );
+    if (!restaurant.ordersAssigned.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No processing orders found for this restaurant.",
+      });
+    }
+
+    // Filter and format orders
+    const processingOrders = restaurant.ordersAssigned
+      .filter((order) => order.orderId) // Only include valid orders
+      .map((order) => {
+        const filteredItems = (order.orderId.items || []).filter((item) => {
+          if (
+            item.itemId &&
+            item.itemId.restaurantId.toString() === restaurantId.toString()
+          ) {
+            return true;
+          }
+          return false;
+        });
+
+        const formattedItems = filteredItems.map((item) => ({
+          name: item.itemId.name,
+          price: item.itemId.price,
+          quantity: item.quantity || 1,
+        }));
+
+        return {
+          orderId: order.orderId._id,
+          createdAt: order.orderId.createdAt,
+          amount: order.orderId.amount,
+          paymentMethod: order.orderId.paymentMethod,
+          orderStatus: order.orderId.orderStatus,
+          items: formattedItems,
+        };
+      })
+      .filter((order) => order.items.length > 0); // Only include orders with items for the restaurant
 
     res.status(200).json({ success: true, data: processingOrders });
   } catch (error) {
     console.error("Error fetching processing orders:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch processing orders." });
+    if (error.code === "ECONNRESET") {
+      return res.status(503).json({
+        success: false,
+        message: "Service temporarily unavailable. Please try again later.",
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch processing orders.",
+    });
   }
 };
 

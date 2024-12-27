@@ -1,0 +1,48 @@
+.earnings-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .earnings-container h1 {
+    color: tomato;
+    margin-bottom: 20px;
+  }
+  
+  .earnings-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+  }
+  
+  .earnings-card h2 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .earnings-card p {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4caf50;
+  }
+  
+  @media screen and (max-width: 480px) {
+    .earnings-container {
+      padding: 15px;
+    }
+  
+    .earnings-card p {
+      font-size: 20px;
+    }
+  }
+  

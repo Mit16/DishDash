@@ -1,0 +1,104 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .Profile {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: 50px auto;
+  }
+  
+  /* Headings */
+  .Profile h2 {
+    text-align: center;
+    color: #ff7f00; /* Orange color */
+    margin-bottom: 20px;
+  }
+  
+  /* Labels and Inputs */
+  .Profile p {
+    margin: 8px 0;
+    color: #333333;
+    font-size: 16px;
+  }
+  
+  .Profile input[type="text"],
+  .Profile input[type="number"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 10px 20px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .Profile input:focus {
+    outline: none;
+    border: 1px solid #ff7f00; /* Orange border on focus */
+    box-shadow: 0 0 5px rgba(255, 127, 0, 0.5);
+  }
+  
+  /* Button Styling */
+  .Profile button {
+    background-color: #ff7f00;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    display: block;
+    width: calc(100% - 40px);
+    margin-left: 20px;
+  }
+  
+  .Profile button:hover {
+    background-color: #e66f00;
+    transition: background-color 0.3s;
+  }
+  
+  .Profile button:active {
+    background-color: #cc5f00;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .Profile {
+      padding: 15px;
+    }
+  
+    .Profile input[type="text"],
+    .Profile input[type="number"] {
+      width: calc(100% - 30px);
+      margin: 5px 10px;
+    }
+  
+    .Profile button {
+      width: calc(100% - 30px);
+      margin-left: 10px;
+    }
+  }
+  
+  /* Form Layout */
+  .Profile > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .Profile > div > div {
+    width: 48%;
+  }
+  
+  .Profile > div > div input {
+    width: calc(100% - 20px);
+  }
+  

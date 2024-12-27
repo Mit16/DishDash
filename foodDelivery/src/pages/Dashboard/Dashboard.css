@@ -1,0 +1,49 @@
+.dashboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .dashboard-container h1 {
+    text-align: center;
+    color: tomato;
+    margin-bottom: 20px;
+  }
+  
+  .profile-section,
+  .vehicle-section,
+  .earnings-section {
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    color: tomato;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    margin: 5px 0;
+    font-size: 16px;
+  }
+  
+  p strong {
+    color: #333;
+  }
+  
+  .dashboard-container p {
+    line-height: 1.6;
+  }
+  
+  .dashboard-container div {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .dashboard-container div:last-child {
+    border-bottom: none;
+  }
+  
