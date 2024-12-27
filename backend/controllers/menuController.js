@@ -212,23 +212,57 @@ const deleteMenuItem = async (req, res) => {
   }
 
   try {
-    const deletedMenuItem = await menuModel.findByIdAndDelete(menuItemId);
+    // Find the menu containing the dish
+    const menu = await menuModel.findOne({ "dishes._id": menuItemId });
 
-    if (!deletedMenuItem) {
+    if (!menu) {
       return res
         .status(404)
         .json({ success: false, message: "Menu item not found" });
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "Menu item deleted successfully" });
+    // Locate the specific dish to delete
+    const dish = menu.dishes.id(menuItemId);
+
+    if (!dish) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Dish not found in menu" });
+    }
+
+    // Extract the public ID from the Cloudinary URL
+    const imageUrl = dish.image;
+    const publicIdMatch = imageUrl.match(/menuUploads\/([^/]+)\.[\w]+$/);
+
+    if (publicIdMatch && publicIdMatch[1]) {
+      const publicId = `menuUploads/${publicIdMatch[1]}`;
+
+      // Delete the image from Cloudinary using the Promise-based API
+      try {
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log("Cloudinary image deleted:", result);
+      } catch (cloudinaryError) {
+        console.error("Cloudinary image deletion failed:", cloudinaryError);
+        // Continue deleting the dish even if the image deletion fails
+      }
+    }
+
+    // Remove the dish from the menu's dishes array
+    menu.dishes.pull(menuItemId);
+
+    // Save the updated menu document
+    await menu.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Menu item and image deleted successfully",
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error deleting menu item", error });
+    console.error("Error deleting menu item:", error); // Add error logging
+    res.status(500).json({ success: false, message: "Error deleting menu item", error });
   }
 };
+
 
 const toggleAvailability = async (req, res) => {
   try {

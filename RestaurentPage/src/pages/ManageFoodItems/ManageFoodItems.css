@@ -1,41 +1,41 @@
-.manage-food-container {
-    padding: 20px;
-    background-color: #fff;
-  }
-  
-  .food-form input, .food-form select {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid tomato;
-    border-radius: 5px;
-  }
-  
-  button {
-    background-color: tomato;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .food-list ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .food-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .food-list button {
-    background-color: red;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
+.delete-button {
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.delete-button:hover {
+  background-color: #d9363e;
+}
+
+.availability-toggle {
+  background-color: #52c41a;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.availability-toggle:hover {
+  background-color: #3aa91e;
+}
+
+.view-details-button {
+  background-color: #1890ff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.view-details-button:hover {
+  background-color: #096dd9;
+}

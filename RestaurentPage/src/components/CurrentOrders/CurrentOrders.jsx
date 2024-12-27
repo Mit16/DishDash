@@ -26,10 +26,15 @@ const CurrentOrders = () => {
 
   const handleFoodPrepared = async (orderId) => {
     try {
+      if (!orderId) {
+        console.error("Order ID is missing");
+        return;
+      }
+
       await updateOrderStatus(orderId, "waiting for delivery boy");
-      setOrders((prev) => prev.filter((order) => order._id !== orderId));
+      setOrders((prev) => prev.filter((order) => order.orderId !== orderId));
     } catch (err) {
-      console.error(err);
+      console.error("Error updating order status:", err.message);
     }
   };
 
@@ -44,10 +49,9 @@ const CurrentOrders = () => {
       {orders.length > 0 ? (
         orders.map((order) => {
           const {
-            _id: orderId,
+            orderId,
             items,
             amount,
-            payment,
             paymentMethod,
             createdAt,
           } = order;
@@ -74,9 +78,6 @@ const CurrentOrders = () => {
               </ul>
               <p>
                 <strong>Total Price:</strong> ₹{amount.toFixed(2)}
-              </p>
-              <p>
-                <strong>Payment Status:</strong> {payment ? "Paid" : "Not Paid"}
               </p>
               <p>
                 <strong>Payment Method:</strong> {paymentMethod}

@@ -76,21 +76,13 @@ const OrderContextProvider = (props) => {
     try {
       const response = await axiosInstance.get("api/orders/processing");
       return response.data; // The API should return only orders with status "processing"
+      // console.log("OrderContext : ", response.data);
     } catch (error) {
       console.error("Error fetching processing orders:", error);
       throw new Error("An error occurred while fetching processing orders.");
     }
   };
-  
-  const getOrderedOrders = async () => {
-    try {
-      const response = await axiosInstance.get("api/orders/orderedorders");
-      return response.data; // The API should return only orders with status "processing"
-    } catch (error) {
-      console.error("Error fetching processing orders:", error);
-      throw new Error("An error occurred while fetching processing orders.");
-    }
-  };
+
   const getwaitingForDeliveryOrders = async () => {
     try {
       const response = await axiosInstance.get("api/orders/preparedorders");
@@ -101,15 +93,25 @@ const OrderContextProvider = (props) => {
     }
   };
 
+  const getOrderedStatusOrders = async () => {
+    try {
+      const response = await axiosInstance.get("/api/orders/ordered"); // Adjust API path as needed
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching 'Ordered' status orders:", error);
+      throw error;
+    }
+  };
+
   const OrderContextValue = useMemo(
     () => ({
-      getOrderedOrders,
       getOrdersByRestaurant,
       updateOrderStatus,
       deleteOrder,
       assignedOrders,
       getProcessingOrders,
       getwaitingForDeliveryOrders,
+      getOrderedStatusOrders,
     }),
     [assignedOrders]
   );

@@ -63,7 +63,7 @@ const MenuContextProvider = (props) => {
   // Delete a menu item by ID
   const deleteMenuItem = async (menuItemId) => {
     try {
-      const response = await axiosInstance.delete(`/menu/${menuItemId}`);
+      const response = await axiosInstance.delete(`/api/menu/delete/${menuItemId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || error.message;

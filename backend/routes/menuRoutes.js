@@ -18,7 +18,7 @@ menuRouter.get("/itemlist", authMiddleware, getMenuItemsByRestaurant); // Get me
 menuRouter.get("/item/:menuItemId", authMiddleware, getMenuItemById); // Get a single menu item by ID;
 menuRouter.post("/add", authMiddleware, addMenuItem); // Create a new menu item;
 menuRouter.put("/:menuItemId", authMiddleware, updateMenuItem); // Update a menu item by ID;
-menuRouter.delete("/:menuItemId", authMiddleware, deleteMenuItem); // Delete a menu item by ID;
+menuRouter.delete("/delete/:menuItemId", authMiddleware, deleteMenuItem); // Delete a menu item by ID;
 menuRouter.patch(
   "/dishes/:id/toggle-availability",
   authMiddleware,

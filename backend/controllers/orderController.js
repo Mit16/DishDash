@@ -228,81 +228,62 @@ const getOrderByRestaurant = async (req, res) => {
 
 const getProcessingOrders = async (req, res) => {
   try {
-    const restaurantId = req.user?._id; // Assuming restaurant ID comes from authenticated user
+    const restaurantId = req.user?._id; // Assuming the authenticated user's ID is the restaurant's ID.
 
     if (!restaurantId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Restaurant ID is required." });
+      return res.status(400).json({ message: "Restaurant ID is required." });
     }
 
-    // Fetch the restaurant and its assigned orders with populated items
+    // Fetch the restaurant with assigned orders
     const restaurant = await restaurentModel
       .findById(restaurantId, "ordersAssigned")
       .populate({
         path: "ordersAssigned.orderId",
-        match: { orderStatus: "processing" },
-        select: "items amount paymentMethod orderStatus createdAt",
-        populate: {
-          path: "items.itemId",
-          select: "name price restaurantId",
-        },
+        select: "items amount paymentMethod orderStatus createdAt", // Select necessary fields from the order schema
       });
 
     if (!restaurant) {
-      return res.status(404).json({
-        success: false,
-        message: "Restaurant not found.",
-      });
+      return res.status(404).json({ message: "Restaurant not found." });
     }
 
-    if (!restaurant.ordersAssigned.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No processing orders found for this restaurant.",
-      });
-    }
-
-    // Filter and format orders
+    // Filter and map the orders to get relevant details
     const processingOrders = restaurant.ordersAssigned
-      .filter((order) => order.orderId) // Only include valid orders
-      .map((order) => {
-        const filteredItems = (order.orderId.items || []).filter((item) => {
-          if (
-            item.itemId &&
-            item.itemId.restaurantId.toString() === restaurantId.toString()
-          ) {
-            return true;
-          }
-          return false;
-        });
+      .map((assignedOrder) => {
+        if (!assignedOrder.orderId) return null; // Skip if orderId is not populated
 
-        const formattedItems = filteredItems.map((item) => ({
-          name: item.itemId.name,
-          price: item.itemId.price,
+        // Filter items belonging to this restaurant
+        const validItems = (assignedOrder.orderId.items || []).filter(
+          (item) => item.restaurantId?.toString() === restaurantId.toString()
+        );
+
+        if (validItems.length === 0) return null; // Skip orders without items for this restaurant
+
+        // Map valid items to format them for response
+        const formattedItems = validItems.map((item) => ({
+          itemId: item.itemId,
+          name: item.name,
+          price: item.price,
           quantity: item.quantity || 1,
         }));
 
         return {
-          orderId: order.orderId._id,
-          createdAt: order.orderId.createdAt,
-          amount: order.orderId.amount,
-          paymentMethod: order.orderId.paymentMethod,
-          orderStatus: order.orderId.orderStatus,
+          orderId: assignedOrder.orderId._id,
+          createdAt: assignedOrder.orderId.createdAt,
+          amount: assignedOrder.orderId.amount,
+          paymentMethod: assignedOrder.orderId.paymentMethod,
+          orderStatus: assignedOrder.orderId.orderStatus,
           items: formattedItems,
         };
       })
-      .filter((order) => order.items.length > 0); // Only include orders with items for the restaurant
+      .filter((order) => order !== null); // Remove null values from the result
 
     res.status(200).json({ success: true, data: processingOrders });
   } catch (error) {
-    console.error("Error fetching processing orders:", error);
-    if (error.code === "ECONNRESET") {
-      return res.status(503).json({
-        success: false,
-        message: "Service temporarily unavailable. Please try again later.",
-      });
-    }
+    console.error(
+      "Error fetching processing orders:",
+      error.message,
+      error.stack
+    );
     res.status(500).json({
       success: false,
       message: "Failed to fetch processing orders.",
@@ -312,7 +293,7 @@ const getProcessingOrders = async (req, res) => {
 
 const getWaitingForDeliveryOrders = async (req, res) => {
   try {
-    const restaurantId = req.user?._id; // Assuming restaurant ID comes from authenticated user
+    const restaurantId = req.user?._id; // Assuming restaurant ID comes from the authenticated user
 
     if (!restaurantId) {
       return res
@@ -320,57 +301,123 @@ const getWaitingForDeliveryOrders = async (req, res) => {
         .json({ success: false, message: "Restaurant ID is required" });
     }
 
-    // Fetch orders assigned to the restaurant
+    // Fetch restaurant and populate assigned orders with "waiting for delivery boy" status
     const restaurant = await restaurentModel
       .findById(restaurantId, "ordersAssigned")
       .populate({
         path: "ordersAssigned.orderId",
-        match: { orderStatus: "waiting for delivery boy" }, // Filter orders
+        match: { orderStatus: "waiting for delivery boy" }, // Filter orders by status
+        select: "items orderStatus deliveryPartnerId", // Select necessary fields
         populate: {
           path: "deliveryPartnerId", // Populate delivery partner details
           select: "fullname phoneNumber",
         },
-        select: "items orderStatus",
-      })
-      .populate({
-        path: "ordersAssigned.items.itemId", // Populate items
-        model: "Menu", // Ensure the model is explicitly defined
-        select: "name", // Select only the 'name' field from the Menu schema
       });
 
     if (!restaurant || !restaurant.ordersAssigned.length) {
       return res.status(404).json({
         success: false,
-        message: "No orders found for this restaurant.",
+        message: "No orders found with status 'waiting for delivery boy'.",
       });
     }
 
-    // Filter and format the data
+    // Filter and format the data to include only relevant items for the restaurant
     const formattedOrders = restaurant.ordersAssigned
-      .filter(
-        (order) =>
-          order.orderId &&
-          order.orderId.orderStatus === "waiting for delivery boy"
-      )
-      .map((order) => ({
-        orderId: order.orderId._id,
-        items: order.items.map((item) => ({
-          name: item.itemId?.name || "Unknown Item", // Default to "Unknown Item" if undefined
-          quantity: item.quantity || 1,
-        })),
-        deliveryPartner: {
-          fullname:
-            `${order.orderId.deliveryPartnerId?.fullname.firstname || ""} ${
-              order.orderId.deliveryPartnerId?.fullname.lastname || ""
-            }`.trim() || "Not Assigned",
-          phoneNumber:
-            order.orderId.deliveryPartnerId?.phoneNumber || "Not Assigned",
-        },
-      }));
+      .filter((assignedOrder) => assignedOrder.orderId) // Ensure orderId is valid
+      .map((assignedOrder) => {
+        const order = assignedOrder.orderId;
+
+        // Filter items specific to the restaurant
+        const validItems = order.items.filter(
+          (item) => item.restaurantId?.toString() === restaurantId.toString()
+        );
+
+        if (!validItems.length) return null; // Skip orders with no valid items
+
+        return {
+          orderId: order._id,
+          orderStatus: order.orderStatus,
+          items: validItems.map((item) => ({
+            name: item.name || "Unknown Item",
+            quantity: item.quantity || 1,
+          })),
+          deliveryPartner: {
+            fullname:
+              `${order.deliveryPartnerId?.fullname?.firstname || ""} ${
+                order.deliveryPartnerId?.fullname?.lastname || ""
+              }`.trim() || "Not Assigned",
+            phoneNumber: order.deliveryPartnerId?.phoneNumber || "Not Assigned",
+          },
+        };
+      })
+      .filter((order) => order !== null); // Remove null orders
 
     res.status(200).json({ success: true, data: formattedOrders });
   } catch (error) {
     console.error("Error fetching waiting for delivery orders:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders.",
+    });
+  }
+};
+
+const getOrderedStatusOrders = async (req, res) => {
+  try {
+    const restaurantId = req.user?._id; // Assuming the authenticated user's ID is the restaurant's ID.
+
+    if (!restaurantId) {
+      return res.status(400).json({
+        success: false,
+        message: "Restaurant ID is required.",
+      });
+    }
+
+    // Fetch the restaurant and populate orders with "Ordered" status
+    const restaurant = await restaurentModel
+      .findById(restaurantId, "ordersAssigned")
+      .populate({
+        path: "ordersAssigned.orderId",
+        match: { orderStatus: "ordered" }, // Filter orders by status
+        select: "items orderStatus createdAt", // Select necessary fields
+      });
+
+    if (!restaurant || !restaurant.ordersAssigned.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found with status 'Ordered'.",
+      });
+    }
+
+    // Filter and format the orders
+    const formattedOrders = restaurant.ordersAssigned
+      .filter((assignedOrder) => assignedOrder.orderId) // Ensure orderId is valid
+      .map((assignedOrder) => {
+        const order = assignedOrder.orderId;
+
+        // Filter items specific to the restaurant
+        const validItems = order.items.filter(
+          (item) => item.restaurantId?.toString() === restaurantId.toString()
+        );
+
+        if (!validItems.length) return null; // Skip orders with no valid items
+
+        return {
+          orderId: order._id,
+          orderStatus: order.orderStatus,
+          createdAt: order.createdAt,
+          items: validItems.map((item) => ({
+            name: item.name || "Unknown Item",
+            quantity: item.quantity || 1,
+            price: item.price || 0,
+          })),
+        };
+      })
+      .filter((order) => order !== null); // Remove null orders
+
+    res.status(200).json({ success: true, data: formattedOrders });
+  } catch (error) {
+    console.error("Error fetching orders with 'Ordered' status:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch orders.",
@@ -387,4 +434,5 @@ export {
   getOrderByRestaurant,
   getProcessingOrders,
   getWaitingForDeliveryOrders,
+  getOrderedStatusOrders,
 };
