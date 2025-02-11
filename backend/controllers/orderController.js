@@ -239,6 +239,7 @@ const getProcessingOrders = async (req, res) => {
       .findById(restaurantId, "ordersAssigned")
       .populate({
         path: "ordersAssigned.orderId",
+        match: { orderStatus: "processing" },
         select: "items amount paymentMethod orderStatus createdAt", // Select necessary fields from the order schema
       });
 
